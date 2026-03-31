@@ -1,0 +1,59 @@
+# ===========================
+# .NET
+# ===========================
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+.vs/
+publish/
+*.nupkg
+*.snupkg
+**/launchSettings.json
+!**/launchSettings.json.example
+*.env
+!*.env.example
+
+# EF Core migrations snapshot temp
+*.mdf
+*.ldf
+*.ndf
+
+# Secrets / local dev config — use Railway/Vercel env vars in production
+appsettings.Development.json
+
+# Rider
+.idea/
+*.sln.iml
+
+# ===========================
+# Node / Frontend
+# ===========================
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+.cache/
+
+# env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# ===========================
+# General
+# ===========================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+.vscode/settings.json
