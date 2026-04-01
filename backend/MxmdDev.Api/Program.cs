@@ -5,15 +5,35 @@ using MxmdDev.Api.Middleware;
 var builder = WebApplication.CreateBuilder(args);
 
 // ── Database ──────────────────────────────────────────────────────────────────
-// Railway injects DATABASE_URL automatically when a Postgres plugin is provisioned.
-// Fall back to ConnectionStrings:DefaultConnection for local dev.
-var connectionString =
+// Railway injects DATABASE_URL as a URI (postgresql://user:pass@host:port/db).
+// Npgsql requires key-value format, so we convert it when a URI is detected.
+// Falls back to ConnectionStrings:DefaultConnection for local dev.
+var rawConnectionString =
     Environment.GetEnvironmentVariable("DATABASE_URL")
     ?? builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("No database connection string configured.");
 
+var connectionString = ConvertDatabaseUrl(rawConnectionString);
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+static string ConvertDatabaseUrl(string url)
+{
+    if (!url.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase) &&
+        !url.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase))
+        return url; // already key-value format
+
+    var uri = new Uri(url);
+    var userInfo = uri.UserInfo.Split(':', 2);
+    var username = Uri.UnescapeDataString(userInfo[0]);
+    var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty;
+    var host = uri.Host;
+    var port = uri.Port > 0 ? uri.Port : 5432;
+    var database = uri.AbsolutePath.TrimStart('/');
+
+    return $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+}
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
 var allowedOrigins = builder.Configuration
