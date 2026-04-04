@@ -24,13 +24,18 @@ export function Home() {
     <main className="flex-1 px-6 py-12 max-w-3xl mx-auto w-full pb-16">
       {/* Hero */}
       <section className="flex flex-col sm:flex-row items-start gap-8 mb-20">
-        <div className="w-40 h-40 shrink-0 bg-black rounded-2xl flex items-center justify-center shadow-lg">
-          <div className="w-16 h-16 bg-gray-700 rounded-xl flex items-center justify-center">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
-              <rect x="2" y="3" width="20" height="14" rx="2" />
-              <path d="M8 21h8M12 17v4" />
-            </svg>
-          </div>
+        <div className="w-40 h-40 shrink-0 rounded-2xl overflow-hidden bg-black shadow-lg">
+          <img
+            src="/avatar.jpg"
+            alt="Mohammed Omar"
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              const el = e.currentTarget;
+              el.style.display = 'none';
+              el.parentElement!.classList.add('flex', 'items-center', 'justify-center');
+              el.parentElement!.innerHTML = '<span class="font-mono text-white text-2xl font-bold">MO</span>';
+            }}
+          />
         </div>
 
         <div>
@@ -38,12 +43,10 @@ export function Home() {
             STATUS: AVAILABLE
           </div>
           <h1 className="font-sans text-4xl sm:text-5xl font-black text-black leading-none tracking-tight mb-4">
-            Software Engineer<br />& Architect
+            Mohammed Omar
           </h1>
           <p className="text-sm text-gray-500 font-sans leading-relaxed">
-            I build elegant systems with precision and logic.<br />
-            Focused on performance-driven architecture and<br />
-            minimalist digital interfaces.
+            Software Engineer with a deep passion for learning and building.
           </p>
         </div>
       </section>

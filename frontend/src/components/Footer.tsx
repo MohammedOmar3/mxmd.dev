@@ -9,7 +9,7 @@ export function Footer() {
       </div>
       <div className="flex items-center gap-6">
         <a
-          href="https://github.com/mxmd-dev"
+          href="https://github.com/MohammedOmar3"
           target="_blank"
           rel="noopener noreferrer"
           className="font-mono text-[10px] text-gray-400 hover:text-black uppercase tracking-widest underline underline-offset-2 transition-colors"
@@ -17,7 +17,7 @@ export function Footer() {
           GitHub
         </a>
         <a
-          href="https://linkedin.com/in/mxmd-dev"
+          href="https://www.linkedin.com/in/mohammed-omar3/"
           target="_blank"
           rel="noopener noreferrer"
           className="font-mono text-[10px] text-gray-400 hover:text-black uppercase tracking-widest underline underline-offset-2 transition-colors"
