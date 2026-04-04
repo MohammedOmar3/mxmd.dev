@@ -53,16 +53,6 @@ export function Projects() {
         )}
       </main>
 
-      {/* Status bar for projects page (non-sticky inline variant) */}
-      <div className="bg-black text-xs font-mono flex items-center justify-between px-4 py-2">
-        <span className="text-gray-400">
-          SYSTEM: <span className="text-[#39FF14]">ONLINE</span>
-        </span>
-        <span className="text-gray-600">
-          VER_2.0.4 // PROJECT_PAGE
-        </span>
-      </div>
-
       <Footer />
     </>
   );

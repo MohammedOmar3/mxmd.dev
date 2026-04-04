@@ -1,6 +1,6 @@
 export function Footer() {
   return (
-    <footer className="mt-auto px-6 py-8 border-t border-gray-200 flex items-center justify-between">
+    <footer className="mt-auto px-6 py-8 pb-12 border-t border-gray-200 flex items-center justify-between">
       <div>
         <p className="font-mono text-xs text-gray-500 mb-0.5">mxmd.dev</p>
         <p className="font-mono text-[10px] text-gray-400">

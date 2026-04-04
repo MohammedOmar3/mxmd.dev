@@ -84,14 +84,6 @@ export function Blog() {
         )}
       </main>
 
-      {/* Status bar for blog (inline non-sticky variant) */}
-      <div className="bg-black text-xs font-mono flex items-center justify-between px-4 py-2">
-        <span className="text-gray-400">
-          SYSTEM STATUS: <span className="text-[#39FF14]">ONLINE</span>
-        </span>
-        <span className="text-gray-600">V2.4.0-STABLE</span>
-      </div>
-
       <Footer />
     </>
   );
