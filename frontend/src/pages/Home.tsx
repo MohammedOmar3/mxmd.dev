@@ -1,9 +1,63 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import type { BlogPost, Project } from '../types';
 import { BlogPostRow } from '../components/BlogPostRow';
 import { ProjectCard } from '../components/ProjectCard';
+
+const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&';
+const TARGET = ['M', 'a', 'X', 'a', 'M', 'e', 'D'] as const;
+const GREEN_IDX = new Set([0, 2, 4, 6]);
+
+function ScrambleName() {
+  const [chars, setChars] = useState<string[] | null>(null);
+  const interval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const locked = useRef(0);
+
+  const start = () => {
+    if (interval.current) clearInterval(interval.current);
+    locked.current = 0;
+    setChars(TARGET.map(() => SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]));
+    interval.current = setInterval(() => {
+      locked.current++;
+      const n = locked.current;
+      setChars(TARGET.map((ch, i) =>
+        i < n ? ch : SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
+      ));
+      if (n >= TARGET.length) {
+        clearInterval(interval.current!);
+        interval.current = null;
+      }
+    }, 50);
+  };
+
+  const stop = () => {
+    if (interval.current) clearInterval(interval.current);
+    interval.current = null;
+    setChars(null);
+  };
+
+  useEffect(() => () => { if (interval.current) clearInterval(interval.current); }, []);
+
+  return (
+    <h1
+      className="font-sans text-4xl sm:text-5xl font-black text-black leading-none tracking-tight mb-4 cursor-default select-none"
+      onMouseEnter={start}
+      onMouseLeave={stop}
+    >
+      {chars ? (
+        <>
+          {chars.map((ch, i) => (
+            <span key={i} className={GREEN_IDX.has(i) ? 'text-[#39FF14]' : undefined}>{ch}</span>
+          ))}
+          {' Omar'}
+        </>
+      ) : (
+        'Mohammed Omar'
+      )}
+    </h1>
+  );
+}
 
 export function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -42,12 +96,7 @@ export function Home() {
           <div className="inline-block font-mono text-[10px] tracking-widest bg-[#39FF14] text-black px-2 py-1 mb-4">
             STATUS: AVAILABLE
           </div>
-          <h1 className="font-sans text-4xl sm:text-5xl font-black text-black leading-none tracking-tight mb-4 group cursor-default">
-            <span className="group-hover:hidden">Mohammed Omar</span>
-            <span className="hidden group-hover:inline">
-              <span className="text-[#39FF14]">M</span>a<span className="text-[#39FF14]">X</span>a<span className="text-[#39FF14]">M</span>e<span className="text-[#39FF14]">D</span> Omar
-            </span>
-          </h1>
+          <ScrambleName />
           <p className="text-sm text-gray-500 font-sans leading-relaxed">
             Software Engineer with a deep passion for learning and building.
           </p>
