@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import type { BlogPost } from '../types';
 
 interface BlogPostRowProps {
@@ -14,7 +15,10 @@ function formatDate(iso: string): string {
 
 export function BlogPostRow({ post }: BlogPostRowProps) {
   return (
-    <div className="py-6 border-b border-gray-200 group flex items-start justify-between gap-4 hover:bg-gray-50 transition-colors px-1">
+    <Link
+      to={`/blog/${post.slug}`}
+      className="block py-6 border-b border-gray-200 group flex items-start justify-between gap-4 hover:bg-gray-50 transition-colors px-1 no-underline"
+    >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-3 mb-2">
           <span className="font-mono text-[10px] text-gray-400 tracking-widest">
@@ -44,6 +48,6 @@ export function BlogPostRow({ post }: BlogPostRowProps) {
       <span className="shrink-0 text-gray-300 group-hover:text-gray-600 text-xl font-light transition-colors">
         +
       </span>
-    </div>
+    </Link>
   );
 }

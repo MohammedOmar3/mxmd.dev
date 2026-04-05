@@ -1,4 +1,4 @@
-import type { BlogListResponse, HealthStatus, Project } from '../types';
+import type { BlogListResponse, BlogPostFull, HealthStatus, Project } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
 
@@ -14,5 +14,6 @@ export const api = {
   getProjects: () => fetcher<Project[]>('/api/projects'),
   getBlogPosts: (page = 1, pageSize = 10) =>
     fetcher<BlogListResponse>(`/api/blog?page=${page}&pageSize=${pageSize}`),
+  getBlogPost: (slug: string) => fetcher<BlogPostFull>(`/api/blog/${slug}`),
   getHealth: () => fetcher<HealthStatus>('/health'),
 };

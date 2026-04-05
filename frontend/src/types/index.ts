@@ -18,6 +18,10 @@ export interface BlogPost {
   publishedAt: string;
 }
 
+export interface BlogPostFull extends BlogPost {
+  content: string;
+}
+
 export interface BlogListResponse {
   total: number;
   page: number;
