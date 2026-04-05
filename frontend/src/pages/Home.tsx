@@ -5,56 +5,82 @@ import type { BlogPost, Project } from '../types';
 import { BlogPostRow } from '../components/BlogPostRow';
 import { ProjectCard } from '../components/ProjectCard';
 
-const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&';
-const TARGET = ['M', 'a', 'X', 'a', 'M', 'e', 'D'] as const;
-const GREEN_IDX = new Set([0, 2, 4, 6]);
+const SC = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%&';
+const SOURCE = 'mohammed';
+const MID    = 'maxamed.'; // same length, collapses to "mxmd" by dropping indices 1,3,5,7
+const rnd = () => SC[Math.floor(Math.random() * SC.length)];
 
 function ScrambleName() {
-  const [chars, setChars] = useState<string[] | null>(null);
-  const interval = useRef<ReturnType<typeof setInterval> | null>(null);
-  const locked = useRef(0);
+  const [chars, setChars] = useState<(string | null)[]>([...SOURCE]);
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const start = () => {
-    if (interval.current) clearInterval(interval.current);
-    locked.current = 0;
-    setChars(TARGET.map(() => SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]));
-    interval.current = setInterval(() => {
-      locked.current++;
-      const n = locked.current;
-      setChars(TARGET.map((ch, i) =>
-        i < n ? ch : SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
-      ));
-      if (n >= TARGET.length) {
-        clearInterval(interval.current!);
-        interval.current = null;
+  const clearT = () => {
+    if (timer.current) { clearInterval(timer.current); timer.current = null; }
+  };
+
+  const onEnter = () => {
+    clearT();
+    // Phase 1: scramble SOURCE → MID, locking left to right
+    let locked = 0;
+    setChars([...SOURCE].map(() => rnd()));
+    timer.current = setInterval(() => {
+      locked++;
+      const next: (string | null)[] = [...MID].map((ch, i) => i < locked ? ch : rnd());
+      setChars(next);
+      if (locked >= 8) {
+        clearT();
+        // Phase 2: collapse indices 7,5,3,1 (right→left) to shrink to "mxmd"
+        const dropping = [7, 5, 3, 1];
+        let step = 0;
+        const state: (string | null)[] = [...MID] as (string | null)[];
+        timer.current = setInterval(() => {
+          state[dropping[step]] = null;
+          step++;
+          setChars([...state]);
+          if (step >= dropping.length) clearT();
+        }, 80);
       }
     }, 50);
   };
 
-  const stop = () => {
-    if (interval.current) clearInterval(interval.current);
-    interval.current = null;
-    setChars(null);
+  const onLeave = () => {
+    clearT();
+    // Jump to collapsed state: keep only m,x,m,d (indices 0,2,4,6)
+    const state: (string | null)[] = [MID[0], null, MID[2], null, MID[4], null, MID[6], null];
+    setChars([...state]);
+    // Phase 1: expand indices 1,3,5,7 back (left→right) to restore "maxamed."
+    const adding = [1, 3, 5, 7];
+    let step = 0;
+    timer.current = setInterval(() => {
+      state[adding[step]] = MID[adding[step]];
+      step++;
+      setChars([...state]);
+      if (step >= adding.length) {
+        clearT();
+        // Phase 2: scramble MID → SOURCE, locking right to left
+        let locked = 0;
+        const srcArr = [...SOURCE];
+        timer.current = setInterval(() => {
+          locked++;
+          setChars(srcArr.map((ch, i) => i >= 8 - locked ? ch : rnd()));
+          if (locked >= 8) {
+            clearT();
+            setChars([...SOURCE]);
+          }
+        }, 50);
+      }
+    }, 80);
   };
 
-  useEffect(() => () => { if (interval.current) clearInterval(interval.current); }, []);
+  useEffect(() => () => clearT(), []);
 
   return (
     <h1
       className="font-sans text-4xl sm:text-5xl font-black text-black leading-none tracking-tight mb-4 cursor-default select-none"
-      onMouseEnter={start}
-      onMouseLeave={stop}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
     >
-      {chars ? (
-        <>
-          {chars.map((ch, i) => (
-            <span key={i} className={GREEN_IDX.has(i) ? 'text-[#39FF14]' : undefined}>{ch}</span>
-          ))}
-          {' Omar'}
-        </>
-      ) : (
-        'Mohammed Omar'
-      )}
+      {chars.filter(c => c !== null).join('')} Omar
     </h1>
   );
 }
@@ -81,7 +107,7 @@ export function Home() {
         <div className="w-40 h-40 shrink-0 rounded-2xl overflow-hidden bg-black shadow-lg">
           <img
             src="/avatar.jpg"
-            alt="Mohammed Omar"
+            alt="mohammed omar"
             className="w-full h-full object-cover"
             onError={(e) => {
               const el = e.currentTarget;
