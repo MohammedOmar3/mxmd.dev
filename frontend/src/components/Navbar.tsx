@@ -12,6 +12,18 @@ export function Navbar() {
 
       <nav className="flex items-center gap-8">
         <NavLink
+          to="/about"
+          className={({ isActive }) =>
+            `font-mono text-xs font-medium tracking-widest uppercase transition-colors ${
+              isActive
+                ? 'text-black underline underline-offset-4 decoration-[#39FF14] decoration-2'
+                : 'text-gray-500 hover:text-black'
+            }`
+          }
+        >
+          About
+        </NavLink>
+        <NavLink
           to="/projects"
           className={({ isActive }) =>
             `font-mono text-xs font-medium tracking-widest uppercase transition-colors ${
