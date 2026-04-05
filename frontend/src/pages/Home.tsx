@@ -80,7 +80,7 @@ function ScrambleName() {
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
     >
-      {chars.filter(c => c !== null).join('')} Omar
+      {chars.filter(c => c !== null).join('')} omar
     </h1>
   );
 }
