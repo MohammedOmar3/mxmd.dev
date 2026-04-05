@@ -42,8 +42,11 @@ export function Home() {
           <div className="inline-block font-mono text-[10px] tracking-widest bg-[#39FF14] text-black px-2 py-1 mb-4">
             STATUS: AVAILABLE
           </div>
-          <h1 className="font-sans text-4xl sm:text-5xl font-black text-black leading-none tracking-tight mb-4">
-            Mohammed Omar
+          <h1 className="font-sans text-4xl sm:text-5xl font-black text-black leading-none tracking-tight mb-4 group cursor-default">
+            <span className="group-hover:hidden">Mohammed Omar</span>
+            <span className="hidden group-hover:inline">
+              <span className="text-[#39FF14]">M</span>a<span className="text-[#39FF14]">X</span>a<span className="text-[#39FF14]">M</span>e<span className="text-[#39FF14]">D</span> Omar
+            </span>
           </h1>
           <p className="text-sm text-gray-500 font-sans leading-relaxed">
             Software Engineer with a deep passion for learning and building.
