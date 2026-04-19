@@ -1,4 +1,4 @@
-import type { AdminBlogPostPayload, BlogListResponse, BlogPostFull, HealthStatus, Project } from '../types';
+import type { AdminBlogPostPayload, BlogListResponse, BlogPostFull, GitHubRepo, HealthStatus, Project } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
 
@@ -39,4 +39,6 @@ export const api = {
     adminFetch<BlogPostFull>('PUT', `/api/admin/blog/${id}`, apiKey, payload),
   adminDeletePost: (id: number, apiKey: string) =>
     adminFetch<void>('DELETE', `/api/admin/blog/${id}`, apiKey),
+
+  getGitHubRepos: () => fetcher<GitHubRepo[]>('/api/github/repos'),
 };

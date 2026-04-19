@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
-import type { Project } from '../types';
-import { ProjectCard } from '../components/ProjectCard';
+import type { GitHubRepo } from '../types';
+import { GitHubRepoCard } from '../components/GitHubRepoCard';
 import { Footer } from '../components/Footer';
 
 export function Projects() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [repos, setRepos] = useState<GitHubRepo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    api.getProjects()
-      .then(setProjects)
-      .catch(console.error)
+    api.getGitHubRepos()
+      .then(setRepos)
+      .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, []);
 
@@ -41,13 +42,17 @@ export function Projects() {
         {loading ? (
           <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-square bg-gray-100 animate-pulse" />
+              <div key={i} className="h-36 bg-gray-100 animate-pulse" />
             ))}
+          </div>
+        ) : error ? (
+          <div className="max-w-5xl mx-auto">
+            <p className="font-mono text-sm text-gray-400">Failed to load repositories.</p>
           </div>
         ) : (
           <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+            {repos.map((repo) => (
+              <GitHubRepoCard key={repo.name} repo={repo} />
             ))}
           </div>
         )}

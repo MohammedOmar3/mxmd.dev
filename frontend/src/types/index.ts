@@ -43,3 +43,11 @@ export interface AdminBlogPostPayload {
   content: string;
   tags: string[];
 }
+
+export interface GitHubRepo {
+  name: string;
+  description: string | null;
+  language: string | null;
+  htmlUrl: string;
+  updatedAt: string;
+}
