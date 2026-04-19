@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MxmdDev.Api.Data;
 using MxmdDev.Api.Middleware;
+using MxmdDev.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,17 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
+
+// ── GitHub ───────────────────────────────────────────────────────────────────
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient("GitHub", c =>
+{
+    c.BaseAddress = new Uri("https://api.github.com/");
+    c.DefaultRequestHeaders.Add("User-Agent", "mxmd.dev");
+    c.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
+    c.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
+});
+builder.Services.AddScoped<GitHubService>();
 
 // ── Controllers + Swagger ─────────────────────────────────────────────────────
 builder.Services.AddControllers();
