@@ -35,3 +35,11 @@ export interface HealthStatus {
   uptimeMs: number;
   timestamp: string;
 }
+
+export interface AdminBlogPostPayload {
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  tags: string[];
+}

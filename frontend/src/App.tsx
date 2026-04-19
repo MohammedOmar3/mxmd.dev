@@ -6,6 +6,7 @@ import { Projects } from './pages/Projects';
 import { Blog } from './pages/Blog';
 import { BlogPostDetail } from './pages/BlogPostDetail';
 import { About } from './pages/About';
+import { Admin } from './pages/Admin';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPostDetail />} />
           <Route path="/about" element={<About />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
         <StatusBar />
       </div>
