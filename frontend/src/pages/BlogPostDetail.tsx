@@ -75,7 +75,7 @@ export function BlogPostDetail() {
           to="/blog"
           className="inline-block font-mono text-[10px] text-gray-400 hover:text-black uppercase tracking-widest mb-10 transition-colors"
         >
-          ← THE SOURCE CODE
+          ← MY JOURNAL
         </Link>
 
         {/* Header */}

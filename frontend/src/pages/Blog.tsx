@@ -50,7 +50,7 @@ export function Blog() {
         {/* Header */}
         <div className="pt-12 pb-6">
           <h1 className="font-mono text-4xl sm:text-5xl font-bold text-black tracking-wide mb-2">
-            The Source Code<span className="text-gray-300">.</span>
+            My Journal<span className="text-gray-300">.</span>
           </h1>
           <div className="w-8 h-0.5 bg-black mt-3" />
         </div>

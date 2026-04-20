@@ -119,9 +119,6 @@ export function Home() {
         </div>
 
         <div>
-          <div className="inline-block font-mono text-[10px] tracking-widest bg-[#39FF14] text-black px-2 py-1 mb-4">
-            STATUS: AVAILABLE
-          </div>
           <ScrambleName />
           <p className="text-sm text-gray-500 font-sans leading-relaxed">
             Software Engineer with a deep passion for learning and building.
