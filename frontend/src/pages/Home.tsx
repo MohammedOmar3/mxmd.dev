@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
-import type { BlogPost, Project } from '../types';
+import type { BlogPost, GitHubRepo } from '../types';
 import { BlogPostRow } from '../components/BlogPostRow';
-import { ProjectCard } from '../components/ProjectCard';
+import { GitHubRepoCard } from '../components/GitHubRepoCard';
 
 const SC = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%&';
 const SOURCE = 'mohammed';
@@ -86,14 +86,14 @@ function ScrambleName() {
 }
 
 export function Home() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [repos, setRepos] = useState<GitHubRepo[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([api.getProjects(), api.getBlogPosts(1, 3)])
-      .then(([projectData, blogData]) => {
-        setProjects(projectData.slice(0, 3));
+    Promise.all([api.getGitHubRepos(), api.getBlogPosts(1, 3)])
+      .then(([repoData, blogData]) => {
+        setRepos(repoData.slice(0, 3));
         setPosts(blogData.posts);
       })
       .catch(console.error)
@@ -143,8 +143,8 @@ export function Home() {
           </div>
         ) : (
           <div className="space-y-3">
-            {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} compact />
+            {repos.map((repo) => (
+              <GitHubRepoCard key={repo.name} repo={repo} compact />
             ))}
           </div>
         )}
