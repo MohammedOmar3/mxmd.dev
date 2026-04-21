@@ -101,6 +101,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 app.UseCors();
 app.UseMiddleware<ApiKeyMiddleware>();
 app.MapControllers();

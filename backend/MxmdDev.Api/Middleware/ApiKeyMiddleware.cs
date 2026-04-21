@@ -13,6 +13,13 @@ public class ApiKeyMiddleware(RequestDelegate next, IConfiguration config)
     {
         if (context.Request.Path.StartsWithSegments(AdminPathPrefix, StringComparison.OrdinalIgnoreCase))
         {
+            // CORS preflight requests do not carry the API key — let UseCors() handle them.
+            if (HttpMethods.IsOptions(context.Request.Method))
+            {
+                await next(context);
+                return;
+            }
+
             if (!context.Request.Headers.TryGetValue(ApiKeyHeader, out var providedKey) ||
                 string.IsNullOrWhiteSpace(providedKey))
             {
