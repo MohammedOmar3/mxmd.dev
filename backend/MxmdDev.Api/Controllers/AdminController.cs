@@ -55,11 +55,38 @@ public class AdminController(AppDbContext db) : ControllerBase
 
     // ── Blog Posts ─────────────────────────────────────────────────────────
 
+    [HttpGet("blog")]
+    public async Task<IActionResult> GetAllBlogPosts()
+    {
+        var posts = await db.BlogPosts
+            .OrderByDescending(b => b.PublishedAt)
+            .Select(b => new
+            {
+                b.Id,
+                b.Slug,
+                b.Title,
+                b.Excerpt,
+                b.Tags,
+                b.PublishedAt,
+                b.IsDraft
+            })
+            .ToListAsync();
+        return Ok(posts);
+    }
+
+    [HttpGet("blog/{id:int}")]
+    public async Task<IActionResult> GetBlogPost(int id)
+    {
+        var post = await db.BlogPosts.FindAsync(id);
+        return post is null ? NotFound() : Ok(post);
+    }
+
     [HttpPost("blog")]
     public async Task<IActionResult> CreateBlogPost([FromBody] BlogPost post)
     {
         post.Id = 0;
-        post.PublishedAt = DateTime.UtcNow;
+        if (!post.IsDraft)
+            post.PublishedAt = DateTime.UtcNow;
 
         if (await db.BlogPosts.AnyAsync(b => b.Slug == post.Slug))
             return Conflict(new { message = "A post with this slug already exists." });
@@ -85,6 +112,9 @@ public class AdminController(AppDbContext db) : ControllerBase
         existing.Excerpt = updated.Excerpt;
         existing.Content = updated.Content;
         existing.Tags = updated.Tags;
+        if (existing.IsDraft && !updated.IsDraft)
+            existing.PublishedAt = DateTime.UtcNow;
+        existing.IsDraft = updated.IsDraft;
 
         await db.SaveChangesAsync();
         return Ok(existing);

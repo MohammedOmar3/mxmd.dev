@@ -17,8 +17,9 @@ public class BlogController(AppDbContext db) : ControllerBase
         if (page < 1) page = 1;
         if (pageSize < 1 || pageSize > 50) pageSize = 10;
 
-        var total = await db.BlogPosts.CountAsync();
+        var total = await db.BlogPosts.CountAsync(b => !b.IsDraft);
         var posts = await db.BlogPosts
+            .Where(b => !b.IsDraft)
             .OrderByDescending(b => b.PublishedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
@@ -39,7 +40,7 @@ public class BlogController(AppDbContext db) : ControllerBase
     [HttpGet("{slug}")]
     public async Task<IActionResult> GetBySlug(string slug)
     {
-        var post = await db.BlogPosts.FirstOrDefaultAsync(b => b.Slug == slug);
+        var post = await db.BlogPosts.FirstOrDefaultAsync(b => b.Slug == slug && !b.IsDraft);
         return post is null ? NotFound() : Ok(post);
     }
 }

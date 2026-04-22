@@ -9,4 +9,5 @@ public class BlogPost
     public string Content { get; set; } = string.Empty;
     public string[] Tags { get; set; } = [];
     public DateTime PublishedAt { get; set; } = DateTime.UtcNow;
+    public bool IsDraft { get; set; } = false;
 }
