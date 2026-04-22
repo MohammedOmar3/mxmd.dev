@@ -16,6 +16,7 @@ export interface BlogPost {
   excerpt: string;
   tags: string[];
   publishedAt: string;
+  isDraft?: boolean;
 }
 
 export interface BlogPostFull extends BlogPost {
@@ -42,6 +43,7 @@ export interface AdminBlogPostPayload {
   excerpt: string;
   content: string;
   tags: string[];
+  isDraft: boolean;
 }
 
 export interface GitHubRepo {

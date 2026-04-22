@@ -16,9 +16,10 @@ interface EditorState {
   excerpt: string;
   tagsRaw: string;
   content: string;
+  isDraft: boolean;
 }
 
-const EMPTY_EDITOR: EditorState = { id: null, title: '', slug: '', excerpt: '', tagsRaw: '', content: '' };
+const EMPTY_EDITOR: EditorState = { id: null, title: '', slug: '', excerpt: '', tagsRaw: '', content: '', isDraft: true };
 
 function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -76,13 +77,13 @@ function PostList({
 
   const load = () => {
     setLoading(true);
-    api.getBlogPosts(1, 50)
-      .then(r => setPosts(r.posts))
+    api.adminGetAllPosts(apiKey)
+      .then(posts => setPosts(posts))
       .catch(() => setError('Failed to load posts.'))
       .finally(() => setLoading(false));
   };
 
-  useEffect(load, []);
+  useEffect(load, [apiKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDelete = async (id: number) => {
     try {
@@ -96,7 +97,7 @@ function PostList({
 
   const handleEdit = async (post: BlogPost) => {
     try {
-      const full = await api.getBlogPost(post.slug);
+      const full = await api.adminGetPost(post.id, apiKey);
       onEdit(full);
     } catch {
       setError('Could not load post content.');
@@ -134,11 +135,18 @@ function PostList({
       <div className="divide-y divide-gray-200 border-y border-gray-200">
         {posts.map(post => (
           <div key={post.id} className="flex items-center justify-between py-4 gap-4">
-            <div className="min-w-0">
-              <p className="font-mono text-sm font-medium text-black truncate">{post.title}</p>
-              <p className="font-mono text-[10px] text-gray-400 mt-0.5">
-                {post.slug} · {new Date(post.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-              </p>
+            <div className="min-w-0 flex items-center gap-2">
+              <div>
+                <p className="font-mono text-sm font-medium text-black truncate">{post.title}</p>
+                <p className="font-mono text-[10px] text-gray-400 mt-0.5">
+                  {post.slug} · {new Date(post.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                </p>
+              </div>
+              {post.isDraft && (
+                <span className="font-mono text-[9px] tracking-widest uppercase border border-gray-300 text-gray-400 px-1.5 py-0.5 shrink-0">
+                  draft
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-3 shrink-0">
               {confirmDelete === post.id ? (
@@ -278,6 +286,7 @@ function PostEditor({
       excerpt: state.excerpt.trim(),
       content: state.content,
       tags: state.tagsRaw.split(',').map(t => t.trim()).filter(Boolean),
+      isDraft: state.isDraft,
     };
     setSaving(true);
     try {
@@ -320,6 +329,15 @@ function PostEditor({
           >
             {preview ? 'Edit' : 'Preview'}
           </button>
+          <label className="flex items-center gap-1.5 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={state.isDraft}
+              onChange={e => set('isDraft', e.target.checked)}
+              className="accent-black h-3.5 w-3.5"
+            />
+            <span className="font-mono text-[10px] tracking-widest uppercase text-gray-500">Draft</span>
+          </label>
           {error && <span className="font-mono text-[10px] text-red-500">{error}</span>}
           {success && <span className="font-mono text-[10px] text-[#39FF14]">Saved ✓</span>}
           <button
@@ -327,7 +345,7 @@ function PostEditor({
             disabled={saving}
             className="font-mono text-xs tracking-widest uppercase bg-black text-white px-5 py-2 hover:bg-gray-900 transition-colors disabled:opacity-50"
           >
-            {saving ? 'Saving...' : state.id === null ? 'Publish' : 'Update'}
+            {saving ? 'Saving...' : state.isDraft ? 'Save Draft' : state.id === null ? 'Publish' : 'Update'}
           </button>
         </div>
       </div>
@@ -408,6 +426,7 @@ export function Admin() {
       excerpt: post.excerpt,
       tagsRaw: post.tags.join(', '),
       content: post.content,
+      isDraft: post.isDraft ?? false,
     });
     setView('editor');
   };

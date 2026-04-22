@@ -33,6 +33,10 @@ export const api = {
   getBlogPost: (slug: string) => fetcher<BlogPostFull>(`/api/blog/${slug}`),
   getHealth: () => fetcher<HealthStatus>('/health'),
 
+  adminGetAllPosts: (apiKey: string) =>
+    adminFetch<BlogPost[]>('GET', '/api/admin/blog', apiKey),
+  adminGetPost: (id: number, apiKey: string) =>
+    adminFetch<BlogPostFull>('GET', `/api/admin/blog/${id}`, apiKey),
   adminCreatePost: (payload: AdminBlogPostPayload, apiKey: string) =>
     adminFetch<BlogPostFull>('POST', '/api/admin/blog', apiKey, payload),
   adminUpdatePost: (id: number, payload: AdminBlogPostPayload, apiKey: string) =>
