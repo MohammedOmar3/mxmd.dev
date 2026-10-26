@@ -13,11 +13,9 @@ export const PROFILE = {
 export interface Role {
   company: string;
   title: string;
-  team?: string;
   location: string;
   start: string;
   end: string;
-  points: string[];
 }
 
 export const EXPERIENCE: Role[] = [
@@ -27,14 +25,6 @@ export const EXPERIENCE: Role[] = [
     location: 'Dubai, UAE',
     start: 'May 2025',
     end: 'Present',
-    points: [
-      'Rebuilt a scheduled batch-file pipeline as a cloud .NET service with checkpoint-based, idempotent recovery and a one-click reprocessing dashboard.',
-      'Built a file processor with failure-isolated handlers, per-handler checkpoints and transactional-outbox publishing.',
-      'Designed an event-driven pipeline on the Cosmos DB change feed with a retrying worker, an audit trail and feature-flag rollback.',
-      'Migrated a .NET 4.5 Web Forms application to .NET 10 through an RFC and proof of concept that reused the existing layers, with sub-60-second rollback.',
-      'Wrote a reconciliation-based stress-test harness that caught silent write failures in a high-volume ingestion path before release.',
-      'Created a shared Azure DevOps CI template with a SonarQube quality gate and automatic PR reports, adopted by 16 repositories.',
-    ],
   },
   {
     company: 'Symology',
@@ -42,10 +32,6 @@ export const EXPERIENCE: Role[] = [
     location: 'Dunstable, UK',
     start: 'Jan 2023',
     end: 'May 2025',
-    points: [
-      'Built features in ASP.NET with thorough unit-test coverage.',
-      'Worked on performance optimisation, new features and bug fixes in agile sprints, and reviewed pull requests.',
-    ],
   },
 ];
 

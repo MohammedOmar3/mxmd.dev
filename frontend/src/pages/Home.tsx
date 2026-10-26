@@ -157,16 +157,8 @@ export function Home() {
                   {role.title} <span className="text-muted font-normal">at</span> {role.company}
                 </h3>
                 <p className="text-sm text-muted mt-1">
-                  {role.team ? `${role.team}, ` : ''}{role.location}
+                  {role.location}
                 </p>
-                <ul className="mt-4 space-y-2.5 list-none p-0 max-w-[70ch]">
-                  {role.points.map((point) => (
-                    <li key={point} className="relative pl-5 text-ink-2">
-                      <span aria-hidden="true" className="absolute left-0 top-[0.7em] size-1.5 bg-neon-ink" />
-                      {point}
-                    </li>
-                  ))}
-                </ul>
               </div>
             </li>
           ))}
