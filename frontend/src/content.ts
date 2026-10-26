@@ -8,16 +8,7 @@ export const PROFILE = {
   email: 'o.mohammed3@hotmail.com',
   github: 'https://github.com/MohammedOmar3',
   linkedin: 'https://www.linkedin.com/in/mohammed-omar3/',
-  intro:
-    'I build event-driven .NET systems that move money reliably: settlement pipelines, transaction processing and the tooling that keeps them honest.',
 };
-
-export const HIGHLIGHTS = [
-  { value: '570+', label: 'settlement files processed with zero data defects' },
-  { value: '~1s', label: 'peak-hour transaction delay, down from 10–15 hours' },
-  { value: '20 min', label: 'failed-file recovery, down from 2+ hours of manual work' },
-  { value: '16', label: 'repositories on the shared CI template I built' },
-];
 
 export interface Role {
   company: string;
@@ -33,15 +24,16 @@ export const EXPERIENCE: Role[] = [
   {
     company: 'Edenred',
     title: 'Software Engineer',
-    team: 'Cards & Transactions',
     location: 'Dubai, UAE',
     start: 'May 2025',
     end: 'Present',
     points: [
-      'Rebuilt the card-settlement pipeline as a cloud .NET service with checkpoint-based, idempotent recovery and a one-click reprocessing dashboard.',
-      'Designed an event-driven transaction pipeline on the Cosmos DB change feed that now powers five transaction policies, including fees and fraud monitoring.',
-      'Led the move of a 100-agent support console from .NET 4.5 Web Forms to .NET 10 through an RFC and proof of concept, shipped with sub-60-second rollback.',
-      'Built a reconciliation stress-test harness that caught silent write failures before production and unlocked a release cutting peak delay to about a second.',
+      'Rebuilt a scheduled batch-file pipeline as a cloud .NET service with checkpoint-based, idempotent recovery and a one-click reprocessing dashboard.',
+      'Built a file processor with failure-isolated handlers, per-handler checkpoints and transactional-outbox publishing.',
+      'Designed an event-driven pipeline on the Cosmos DB change feed with a retrying worker, an audit trail and feature-flag rollback.',
+      'Migrated a .NET 4.5 Web Forms application to .NET 10 through an RFC and proof of concept that reused the existing layers, with sub-60-second rollback.',
+      'Wrote a reconciliation-based stress-test harness that caught silent write failures in a high-volume ingestion path before release.',
+      'Created a shared Azure DevOps CI template with a SonarQube quality gate and automatic PR reports, adopted by 16 repositories.',
     ],
   },
   {
@@ -51,8 +43,8 @@ export const EXPERIENCE: Role[] = [
     start: 'Jan 2023',
     end: 'May 2025',
     points: [
-      'Developed features for asset management software in ASP.NET, backed by thorough unit tests.',
-      'Worked in agile sprints on performance, new features and bug fixes, and reviewed peers’ code to catch issues early.',
+      'Built features in ASP.NET with thorough unit-test coverage.',
+      'Worked on performance optimisation, new features and bug fixes in agile sprints, and reviewed pull requests.',
     ],
   },
 ];

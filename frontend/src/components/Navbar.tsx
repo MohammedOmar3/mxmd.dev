@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 
 const SECTIONS = [
+  { hash: '#journal', label: 'Journal' },
   { hash: '#experience', label: 'Experience' },
   { hash: '#projects', label: 'Projects' },
-  { hash: '#journal', label: 'Journal' },
   { hash: '#contact', label: 'Contact' },
 ];
 
@@ -20,7 +20,7 @@ export function Navbar() {
             <Link
               key={hash}
               to={{ pathname: '/', hash }}
-              className={`text-sm text-ink-2 no-underline hover:text-ink ${i < 2 ? 'hidden sm:inline' : ''}`}
+              className={`text-sm text-ink-2 no-underline hover:text-ink ${i >= 2 ? 'hidden sm:inline' : ''}`}
             >
               {label}
             </Link>

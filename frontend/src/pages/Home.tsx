@@ -3,7 +3,7 @@ import { api } from '../lib/api';
 import type { BlogPost, GitHubRepo } from '../types';
 import { BlogPostRow } from '../components/BlogPostRow';
 import { GitHubRepoCard } from '../components/GitHubRepoCard';
-import { EDUCATION, EXPERIENCE, HIGHLIGHTS, PROFILE, PROJECTS, SKILLS } from '../content';
+import { EDUCATION, EXPERIENCE, PROFILE, PROJECTS, SKILLS } from '../content';
 
 const POSTS_PAGE_SIZE = 4;
 const MORE_REPOS = 6;
@@ -102,11 +102,8 @@ export function Home() {
           </div>
         </div>
 
-        <p className="mt-8 text-xl sm:text-2xl leading-snug text-ink-2 max-w-[36ch] tracking-tight">
-          {PROFILE.intro}
-        </p>
 
-        <p className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-xs text-muted">
+        <p className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-xs text-muted">
           <span>{PROFILE.location}</span>
           <span className="flex items-center gap-2 text-ink">
             <span aria-hidden="true" className="size-1.5 rounded-full bg-neon ring-2 ring-neon/30" />
@@ -121,23 +118,31 @@ export function Home() {
         </div>
       </section>
 
-      {/* Highlights */}
-      <section aria-label="Highlights" className="mt-16 sm:mt-20 rounded-2xl bg-night text-paper overflow-hidden">
-        <dl className="grid grid-cols-2 lg:grid-cols-4 m-0">
-          {HIGHLIGHTS.map((h, i) => (
-            <div
-              key={h.label}
-              className={`p-6 sm:p-8 border-night-rule ${i % 2 ? 'border-l' : ''} ${i >= 2 ? 'border-t lg:border-t-0' : ''} ${i === 2 ? 'lg:border-l' : ''}`}
-            >
-              <dt className="sr-only">{h.label}</dt>
-              <dd className="m-0">
-                <span className="block text-3xl sm:text-4xl font-semibold tracking-tight text-neon">{h.value}</span>
-                <span className="block mt-2 text-sm text-night-muted leading-snug">{h.label}</span>
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+
+      {/* Journal */}
+      <Section id="journal" title="Journal">
+        {postsLoading ? (
+          <ul aria-busy="true" className="list-none m-0 p-0 space-y-2">
+            {[1, 2, 3].map((i) => <li key={i} className="skeleton h-20" />)}
+          </ul>
+        ) : postsError ? (
+          <p className="text-sm text-muted">The journal didn’t load. Try again in a moment.</p>
+        ) : posts.length === 0 ? (
+          <p className="text-sm text-muted">No posts yet.</p>
+        ) : (
+          <ul className="list-none m-0 p-0 border-t border-rule">
+            {posts.map((post) => <BlogPostRow key={post.id} post={post} />)}
+          </ul>
+        )}
+
+        {!postsLoading && hasMorePosts && (
+          <div className="mt-8">
+            <button type="button" onClick={loadMore} disabled={loadingMore} aria-busy={loadingMore} className="btn btn-ghost">
+              {loadingMore ? 'Loading…' : 'Load more posts'}
+            </button>
+          </div>
+        )}
+      </Section>
 
       {/* Experience */}
       <Section id="experience" title="Experience">
@@ -237,31 +242,6 @@ export function Home() {
             </div>
           ))}
         </dl>
-      </Section>
-
-      {/* Journal */}
-      <Section id="journal" title="Journal">
-        {postsLoading ? (
-          <ul aria-busy="true" className="list-none m-0 p-0 space-y-2">
-            {[1, 2, 3].map((i) => <li key={i} className="skeleton h-20" />)}
-          </ul>
-        ) : postsError ? (
-          <p className="text-sm text-muted">The journal didn’t load. Try again in a moment.</p>
-        ) : posts.length === 0 ? (
-          <p className="text-sm text-muted">No posts yet.</p>
-        ) : (
-          <ul className="list-none m-0 p-0 border-t border-rule">
-            {posts.map((post) => <BlogPostRow key={post.id} post={post} />)}
-          </ul>
-        )}
-
-        {!postsLoading && hasMorePosts && (
-          <div className="mt-8">
-            <button type="button" onClick={loadMore} disabled={loadingMore} aria-busy={loadingMore} className="btn btn-ghost">
-              {loadingMore ? 'Loading…' : 'Load more posts'}
-            </button>
-          </div>
-        )}
       </Section>
 
       {/* Contact */}
