@@ -1,28 +1,43 @@
-﻿import { BrowserRouter, Route, Routes } from 'react-router-dom';
+﻿import { useEffect } from 'react';
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
+import { Footer } from './components/Footer';
 import { StatusBar } from './components/StatusBar';
 import { Home } from './pages/Home';
-import { Projects } from './pages/Projects';
-import { Blog } from './pages/Blog';
 import { BlogPostDetail } from './pages/BlogPostDetail';
-import { About } from './pages/About';
 import { Admin } from './pages/Admin';
+
+// Scrolls to the section named in the URL hash, or to the top on a new page.
+function ScrollToHash() {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (!hash) {
+      window.scrollTo(0, 0);
+      return;
+    }
+    const el = document.getElementById(hash.slice(1));
+    el?.scrollIntoView();
+  }, [pathname, hash]);
+
+  return null;
+}
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:slug" element={<BlogPostDetail />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/admin" element={<Admin />} />
-        </Routes>
-        <StatusBar />
-      </div>
+      <ScrollToHash />
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<Navigate to={{ pathname: '/', hash: '#about' }} replace />} />
+        <Route path="/projects" element={<Navigate to={{ pathname: '/', hash: '#work' }} replace />} />
+        <Route path="/blog" element={<Navigate to={{ pathname: '/', hash: '#journal' }} replace />} />
+        <Route path="/blog/:slug" element={<BlogPostDetail />} />
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
+      <Footer />
+      <StatusBar />
     </BrowserRouter>
   );
 }

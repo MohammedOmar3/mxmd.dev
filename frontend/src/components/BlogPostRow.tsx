@@ -6,48 +6,35 @@ interface BlogPostRowProps {
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
+  return new Date(iso).toLocaleDateString('en-GB', {
     year: 'numeric',
     month: 'short',
-    day: '2-digit',
+    day: 'numeric',
   });
 }
 
+/** One post as a row in the Journal index. */
 export function BlogPostRow({ post }: BlogPostRowProps) {
   return (
-    <Link
-      to={`/blog/${post.slug}`}
-      className="block py-6 border-b border-gray-200 group flex items-start justify-between gap-4 hover:bg-gray-50 transition-colors px-1 no-underline"
-    >
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-3 mb-2">
-          <span className="font-mono text-[10px] text-gray-400 tracking-widest">
-            {formatDate(post.publishedAt)}
-          </span>
-          <div className="flex gap-1.5">
-            {post.tags.map((tag) => (
-              <span
-                key={tag}
-                className="font-mono text-[10px] border border-[#39FF14] text-[#2acc0f] px-1.5 py-0.5 uppercase tracking-wider"
-              >
-                [{tag}]
-              </span>
-            ))}
-          </div>
-        </div>
+    <li className="grid gap-x-(--gap-columns) gap-y-2 py-6 border-b border-rule sm:grid-cols-[minmax(0,2fr)_minmax(0,10fr)] items-baseline">
+      <p className="label text-muted">
+        <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+      </p>
 
-        <h3 className="font-sans text-lg font-bold text-black group-hover:text-gray-700 transition-colors leading-snug mb-1">
-          {post.title}
+      <div className="min-w-0">
+        <h3 className="text-title sm:text-3xl leading-none mb-3">
+          <Link to={`/blog/${post.slug}`} className="link no-underline hover:underline">
+            {post.title}
+          </Link>
         </h3>
-
-        <p className="text-xs text-gray-500 font-sans leading-relaxed max-w-xl">
-          {post.excerpt}
-        </p>
+        <p className="text-base text-ink-2 max-w-[72ch]">{post.excerpt}</p>
+        {post.tags.length > 0 && (
+          <p className="label text-muted mt-2">
+            <span className="visually-hidden">Tagged </span>
+            {post.tags.join(', ')}
+          </p>
+        )}
       </div>
-
-      <span className="shrink-0 text-gray-300 group-hover:text-gray-600 text-xl font-light transition-colors">
-        +
-      </span>
-    </Link>
+    </li>
   );
 }

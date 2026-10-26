@@ -4,11 +4,12 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { api } from '../lib/api';
 import type { BlogPostFull } from '../types';
-import { Footer } from '../components/Footer';
 import { markdownComponents } from '../lib/markdownComponents';
 
+const JOURNAL = { pathname: '/', hash: '#journal' };
+
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
+  return new Date(iso).toLocaleDateString('en-GB', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -40,13 +41,13 @@ export function BlogPostDetail() {
 
   if (loading) {
     return (
-      <main className="flex-1 max-w-2xl mx-auto px-6 py-16 w-full">
-        <div className="space-y-4 animate-pulse">
-          <div className="h-4 bg-gray-200 w-32" />
-          <div className="h-10 bg-gray-200 w-3/4" />
-          <div className="h-4 bg-gray-200 w-48" />
-          <div className="mt-12 space-y-3">
-            {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-4 bg-gray-100" />)}
+      <main className="frame flex-1 pt-(--space-2xl)">
+        <div aria-busy="true" className="max-w-[44rem] mx-auto space-y-4">
+          <div className="skeleton h-4 w-32" />
+          <div className="skeleton h-16 w-3/4" />
+          <div className="skeleton h-4 w-48" />
+          <div className="pt-12 space-y-3">
+            {[1, 2, 3, 4, 5].map(i => <div key={i} className="skeleton h-4" />)}
           </div>
         </div>
       </main>
@@ -55,11 +56,13 @@ export function BlogPostDetail() {
 
   if (notFound || !post) {
     return (
-      <main className="flex-1 max-w-2xl mx-auto px-6 py-16 w-full">
-        <p className="font-mono text-sm text-gray-400">Post not found.</p>
-        <button onClick={() => navigate('/blog')} className="mt-4 font-mono text-xs text-[#39FF14] uppercase tracking-widest hover:underline">
-          ← Back to blog
-        </button>
+      <main className="frame flex-1 pt-(--space-2xl)">
+        <div className="max-w-[44rem] mx-auto">
+          <h1 className="text-display-s mb-(--space-lg)">Post not found</h1>
+          <button type="button" onClick={() => navigate(JOURNAL)} className="label btn btn--secondary">
+            Back to the journal
+          </button>
+        </div>
       </main>
     );
   }
@@ -67,62 +70,31 @@ export function BlogPostDetail() {
   const minutes = readingTime(post.content);
 
   return (
-    <>
-      <main className="flex-1 max-w-2xl mx-auto px-6 py-12 w-full pb-20">
+    <main className="frame flex-1 pt-(--space-2xl)">
+      <article className="max-w-[44rem] mx-auto">
 
-        {/* Back link */}
-        <Link
-          to="/blog"
-          className="inline-block font-mono text-[10px] text-gray-400 hover:text-black uppercase tracking-widest mb-10 transition-colors"
-        >
-          ← MY JOURNAL
-        </Link>
-
-        {/* Header */}
-        <header className="mb-10">
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {post.tags.map(tag => (
-              <span
-                key={tag}
-                className="font-mono text-[10px] border border-[#39FF14] text-[#2acc0f] px-1.5 py-0.5 uppercase tracking-wider"
-              >
-                [{tag}]
-              </span>
-            ))}
-          </div>
-
-          <h1 className="font-sans text-3xl sm:text-4xl font-black text-black leading-tight tracking-tight mb-4">
+        <header className="opens mb-(--space-xl)">
+          <h1 className="text-display-s sm:text-display max-w-none mb-(--space-lg)">
             {post.title}
           </h1>
 
-          <div className="flex items-center gap-4 font-mono text-[10px] text-gray-400 uppercase tracking-widest">
-            <span>{formatDate(post.publishedAt)}</span>
-            <span className="text-gray-300">·</span>
-            <span>{minutes} MIN READ</span>
-          </div>
+          <p className="label text-muted flex flex-wrap gap-x-6 gap-y-1">
+            <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+            <span>{minutes} min read</span>
+            {post.tags.length > 0 && <span>{post.tags.join(', ')}</span>}
+          </p>
         </header>
 
-        <div className="w-full h-px bg-gray-200 mb-10" />
-
-        {/* Markdown content */}
-        <article className="prose-mxmd">
+        <div className="border-t border-rule pt-(--space-xl)">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
             {post.content}
           </ReactMarkdown>
-        </article>
-
-        {/* Footer nav */}
-        <div className="mt-16 pt-8 border-t border-gray-200">
-          <Link
-            to="/blog"
-            className="font-mono text-[10px] text-gray-400 hover:text-black uppercase tracking-widest transition-colors"
-          >
-            ← ALL POSTS
-          </Link>
         </div>
-      </main>
 
-      <Footer />
-    </>
+        <p className="label mt-(--space-2xl) pt-(--space-lg) border-t border-rule">
+          <Link to={JOURNAL} className="link text-ink">All posts</Link>
+        </p>
+      </article>
+    </main>
   );
 }

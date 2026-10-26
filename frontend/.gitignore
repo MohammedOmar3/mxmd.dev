@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Hallmark design-run artifacts (screenshots, lint records)
+.hallmark/

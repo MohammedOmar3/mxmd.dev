@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import type { BlogPost, GitHubRepo } from '../types';
 import { BlogPostRow } from '../components/BlogPostRow';
@@ -9,6 +8,16 @@ const SC = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%&';
 const SOURCE = 'mohammed';
 const MID    = 'maxamed.'; // same length, collapses to "mxmd" by dropping indices 1,3,5,7
 const rnd = () => SC[Math.floor(Math.random() * SC.length)];
+
+const SKILLS = [
+  'C#', '.NET', 'Azure', 'SQL',
+  'React', 'TypeScript', 'REST APIs', 'Entity Framework',
+  'PostgreSQL', 'Docker', 'Git',
+];
+
+const CURRENT_ROLE = { company: 'Edenred UAE', title: 'Software Engineer', since: 'May 2025' };
+
+const POSTS_PAGE_SIZE = 4;
 
 function ScrambleName() {
   const [chars, setChars] = useState<(string | null)[]>([...SOURCE]);
@@ -74,116 +83,218 @@ function ScrambleName() {
 
   useEffect(() => () => clearT(), []);
 
+  // The scramble swaps glyphs; it never moves anything, so it plays under reduced motion too.
   return (
     <h1
-      className="font-sans text-4xl sm:text-5xl font-black text-black leading-none tracking-tight mb-4 cursor-default select-none"
+      aria-label="mohammed omar"
+      className="max-w-none text-[clamp(4rem,9vw+1rem,10rem)] leading-[0.88] cursor-default select-none"
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
     >
-      {chars.filter(c => c !== null).join('')} omar
+      <span aria-hidden="true">{chars.filter(c => c !== null).join('')}</span>
+      <br aria-hidden="true" />
+      <span aria-hidden="true">omar</span>
     </h1>
+  );
+}
+
+function Portrait() {
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <div className="photo aspect-[4/5] w-full bg-paper-2 overflow-hidden">
+      {failed ? (
+        <div className="w-full h-full flex items-center justify-center">
+          <span className="font-display font-extrabold text-ink text-display">MO</span>
+        </div>
+      ) : (
+        <img
+          src="/avatar.jpg"
+          alt="Mohammed Omar"
+          className="w-full h-full object-cover [filter:saturate(0.9)_contrast(1.04)]"
+          onError={() => setFailed(true)}
+        />
+      )}
+    </div>
+  );
+}
+
+function SectionHead({ id, title }: { id: string; title: string }) {
+  return (
+    <h2 id={`${id}-title`} className="mb-(--space-xl)">
+      {title}
+    </h2>
   );
 }
 
 export function Home() {
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
+  const [reposLoading, setReposLoading] = useState(true);
+  const [reposError, setReposError] = useState(false);
+
   const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [postsPage, setPostsPage] = useState(1);
+  const [postsTotal, setPostsTotal] = useState(0);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [postsError, setPostsError] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const initialLoad = useRef(true);
 
   useEffect(() => {
-    Promise.all([api.getGitHubRepos(), api.getBlogPosts(1, 3)])
-      .then(([repoData, blogData]) => {
-        setRepos(repoData.slice(0, 3));
-        setPosts(blogData.posts);
+    if (!initialLoad.current) return;
+    initialLoad.current = false;
+
+    api.getGitHubRepos()
+      .then(setRepos)
+      .catch(() => setReposError(true))
+      .finally(() => setReposLoading(false));
+
+    api.getBlogPosts(1, POSTS_PAGE_SIZE)
+      .then((data) => {
+        setPosts(data.posts);
+        setPostsTotal(data.total);
       })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .catch(() => setPostsError(true))
+      .finally(() => setPostsLoading(false));
   }, []);
 
-  return (
-    <main className="flex-1 px-6 py-12 max-w-3xl mx-auto w-full pb-16">
-      {/* Hero */}
-      <section className="flex flex-col sm:flex-row items-start gap-8 mb-20">
-        <div className="w-40 h-40 shrink-0 rounded-2xl overflow-hidden bg-black shadow-lg">
-          <img
-            src="/avatar.jpg"
-            alt="mohammed omar"
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              const el = e.currentTarget;
-              el.style.display = 'none';
-              el.parentElement!.classList.add('flex', 'items-center', 'justify-center');
-              el.parentElement!.innerHTML = '<span class="font-mono text-white text-2xl font-bold">MO</span>';
-            }}
-          />
-        </div>
+  const loadMore = async () => {
+    setLoadingMore(true);
+    try {
+      const nextPage = postsPage + 1;
+      const data = await api.getBlogPosts(nextPage, POSTS_PAGE_SIZE);
+      setPosts((prev) => [...prev, ...data.posts]);
+      setPostsPage(nextPage);
+      setPostsTotal(data.total);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
-        <div>
+  const hasMorePosts = posts.length < postsTotal;
+
+  return (
+    <main className="frame flex-1">
+      {/* Hero */}
+      <section
+        aria-label="Introduction"
+        className="flex flex-col md:flex-row md:items-end gap-(--gap-columns) md:gap-(--space-3xl) pt-(--space-2xl) pb-(--space-2xl)"
+      >
+        <div className="flex flex-col gap-(--space-lg) min-w-0">
           <ScrambleName />
-          <p className="text-sm text-gray-500 font-sans leading-relaxed">
+          <p className="standfirst max-w-[30ch]">
             Software Engineer with a deep passion for learning and building.
           </p>
+          <div className="label flex flex-wrap gap-3">
+            <a
+              href="https://github.com/MohammedOmar3"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn--primary"
+            >
+              GitHub
+            </a>
+            <a
+              href="https://www.linkedin.com/in/mohammed-omar3/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn--secondary"
+            >
+              LinkedIn
+            </a>
+          </div>
+        </div>
+
+        <div className="w-full max-w-[26rem] md:max-w-none md:w-[min(42%,30rem)] md:shrink-0">
+          <Portrait />
         </div>
       </section>
 
-      {/* Recent Work */}
-      <section className="mb-16">
-        <p className="font-mono text-[10px] text-gray-400 tracking-widest uppercase mb-6">
-          01 // RECENT WORK
-        </p>
+      {/* About */}
+      <section id="about" aria-labelledby="about-title" className="opens mt-(--space-xl)">
+        <SectionHead id="about" title="About" />
+        <div className="grid gap-(--gap-columns) md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+          <p className="statement">
+            I care about clean code, well-designed systems, and shipping things that work.
+            Currently focused on backend development with .NET and cloud infrastructure on Azure.
+          </p>
 
-        {loading ? (
-          <div className="space-y-3">
+          <dl className="m-0 grid gap-(--space-lg) content-start">
+            <div className="border-t border-rule pt-3">
+              <dt className="label text-muted">Now</dt>
+              <dd className="m-0 mt-1 text-ink">
+                {CURRENT_ROLE.title} at {CURRENT_ROLE.company}, since {CURRENT_ROLE.since}
+              </dd>
+            </div>
+            <div className="border-t border-rule pt-3">
+              <dt className="label text-muted">Works with</dt>
+              <dd className="m-0 mt-1 text-ink">{SKILLS.join(', ')}</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      {/* Work */}
+      <section id="work" aria-labelledby="work-title" className="opens mt-(--section-gap-s)">
+        <SectionHead id="work" title="Work" />
+        {reposLoading ? (
+          <ul aria-busy="true" className="list-none m-0 p-0 border-t border-rule">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-28 bg-gray-100 animate-pulse" />
+              <li key={i} className="skeleton h-20 border-b border-rule" />
             ))}
-          </div>
+          </ul>
+        ) : reposError ? (
+          <p className="label text-muted border-t border-rule pt-6">
+            The repositories didn’t load. GitHub has them all at{' '}
+            <a href="https://github.com/MohammedOmar3" className="link text-ink" target="_blank" rel="noopener noreferrer">
+              MohammedOmar3
+            </a>.
+          </p>
         ) : (
-          <div className="space-y-3">
+          <ul className="list-none m-0 p-0 border-t border-rule">
             {repos.map((repo) => (
-              <GitHubRepoCard key={repo.name} repo={repo} compact />
+              <GitHubRepoCard key={repo.name} repo={repo} />
             ))}
-          </div>
+          </ul>
         )}
-
-        <div className="mt-6 text-right">
-          <Link
-            to="/projects"
-            className="font-mono text-xs text-[#39FF14] hover:underline underline-offset-4 uppercase tracking-widest font-semibold"
-          >
-            VIEW ALL PROJECTS →
-          </Link>
-        </div>
       </section>
 
-      {/* Recent Thoughts */}
-      <section className="mb-16">
-        <p className="font-mono text-[10px] text-gray-400 tracking-widest uppercase mb-2">
-          02 // RECENT THOUGHTS
-        </p>
-
-        {loading ? (
-          <div className="space-y-2">
+      {/* Journal */}
+      <section id="journal" aria-labelledby="journal-title" className="opens mt-(--section-gap-s)">
+        <SectionHead id="journal" title="Journal" />
+        {postsLoading ? (
+          <ul aria-busy="true" className="list-none m-0 p-0 border-t border-rule">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-gray-100 animate-pulse" />
+              <li key={i} className="skeleton h-24 border-b border-rule" />
             ))}
-          </div>
+          </ul>
+        ) : postsError ? (
+          <p className="label text-muted border-t border-rule pt-6">The journal didn’t load. Try again in a moment.</p>
+        ) : posts.length === 0 ? (
+          <p className="label text-muted border-t border-rule pt-6">No posts yet.</p>
         ) : (
-          <div>
+          <ul className="list-none m-0 p-0 border-t border-rule">
             {posts.map((post) => (
               <BlogPostRow key={post.id} post={post} />
             ))}
-          </div>
+          </ul>
         )}
 
-        <div className="mt-6 text-right">
-          <Link
-            to="/blog"
-            className="font-mono text-xs text-[#39FF14] hover:underline underline-offset-4 uppercase tracking-widest font-semibold"
-          >
-            READ MORE →
-          </Link>
-        </div>
+        {!postsLoading && hasMorePosts && (
+          <div className="label mt-(--space-xl)">
+            <button
+              type="button"
+              onClick={loadMore}
+              disabled={loadingMore}
+              aria-busy={loadingMore}
+              className="btn btn--secondary"
+            >
+              {loadingMore ? 'Loading posts' : 'Load more posts'}
+            </button>
+          </div>
+        )}
       </section>
     </main>
   );

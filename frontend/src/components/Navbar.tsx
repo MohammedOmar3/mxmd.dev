@@ -1,53 +1,34 @@
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
+const SECTIONS = [
+  { hash: '#about', label: 'About' },
+  { hash: '#work', label: 'Work' },
+  { hash: '#journal', label: 'Journal' },
+];
 
 export function Navbar() {
   return (
-    <header className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white sticky top-0 z-50">
-      <NavLink
-        to="/"
-        className="font-mono text-sm font-semibold tracking-tight text-black hover:text-gray-600 transition-colors"
-      >
-        mxmd.dev
-      </NavLink>
+    <header className="sticky top-0 z-(--z-sticky-nav) bg-paper border-b border-rule">
+      <div className="frame flex items-center justify-between min-h-16">
+        <Link
+          to="/"
+          className="label text-base text-ink no-underline hover:text-ink-2"
+        >
+          mxmd.dev
+        </Link>
 
-      <nav className="flex items-center gap-8">
-        <NavLink
-          to="/about"
-          className={({ isActive }) =>
-            `font-mono text-xs font-medium tracking-widest uppercase transition-colors ${
-              isActive
-                ? 'text-black underline underline-offset-4 decoration-[#39FF14] decoration-2'
-                : 'text-gray-500 hover:text-black'
-            }`
-          }
-        >
-          About
-        </NavLink>
-        <NavLink
-          to="/projects"
-          className={({ isActive }) =>
-            `font-mono text-xs font-medium tracking-widest uppercase transition-colors ${
-              isActive
-                ? 'text-black underline underline-offset-4 decoration-[#39FF14] decoration-2'
-                : 'text-gray-500 hover:text-black'
-            }`
-          }
-        >
-          Projects
-        </NavLink>
-        <NavLink
-          to="/blog"
-          className={({ isActive }) =>
-            `font-mono text-xs font-medium tracking-widest uppercase transition-colors ${
-              isActive
-                ? 'text-black underline underline-offset-4 decoration-[#39FF14] decoration-2'
-                : 'text-gray-500 hover:text-black'
-            }`
-          }
-        >
-          Blog
-        </NavLink>
-      </nav>
+        <nav aria-label="Sections" className="flex items-center gap-6 sm:gap-8">
+          {SECTIONS.map(({ hash, label }) => (
+            <Link
+              key={hash}
+              to={{ pathname: '/', hash }}
+              className="label link text-ink-2 no-underline hover:underline"
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
+      </div>
     </header>
   );
 }
