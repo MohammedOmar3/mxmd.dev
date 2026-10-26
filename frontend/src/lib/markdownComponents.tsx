@@ -38,7 +38,7 @@ SyntaxHighlighter.registerLanguage('go', go);
 // The code block runs on the ink band; its token colours come from the theme too.
 const codeTheme = {
   ...oneDark,
-  'pre[class*="language-"]': { ...oneDark['pre[class*="language-"]'], background: 'var(--color-ink)' },
+  'pre[class*="language-"]': { ...oneDark['pre[class*="language-"]'], background: 'var(--color-night)' },
   'code[class*="language-"]': { ...oneDark['code[class*="language-"]'], background: 'none', fontFamily: 'var(--font-mono)' },
 };
 
@@ -49,7 +49,7 @@ export const markdownComponents: Components = {
     if (isInline) {
       return (
         <code
-          className="font-mono text-[0.85em] bg-paper-2 text-ink px-1 py-0.5"
+          className="font-mono text-[0.85em] bg-surface border border-rule rounded px-1.5 py-0.5 text-ink"
           {...props}
         >
           {children}
@@ -57,9 +57,10 @@ export const markdownComponents: Components = {
       );
     }
     return (
-      <figure className="my-8 mx-0 bg-ink">
-        <figcaption className="label text-xs text-rule-2 px-4 py-2 border-b border-ink-2">
-          {match[1]}
+      <figure className="my-8 mx-0 bg-night rounded-xl overflow-hidden">
+        <figcaption className="font-mono text-xs text-night-muted px-4 py-2 border-b border-night-rule flex items-center justify-between">
+          <span>{match[1]}</span>
+          <span aria-hidden="true" className="size-1.5 rounded-full bg-neon" />
         </figcaption>
         <SyntaxHighlighter
           style={codeTheme}
@@ -79,44 +80,44 @@ export const markdownComponents: Components = {
     );
   },
   h1: ({ children }) => (
-    <h2 className="text-section mt-(--space-2xl) mb-(--space-md)">
+    <h2 className="text-3xl mt-14 mb-4">
       {children}
     </h2>
   ),
   h2: ({ children }) => (
-    <h2 className="text-3xl mt-(--space-2xl) mb-(--space-md)">
+    <h2 className="text-2xl mt-12 mb-4">
       {children}
     </h2>
   ),
   h3: ({ children }) => (
-    <h3 className="text-2xl mt-(--space-xl) mb-(--space-sm)">
+    <h3 className="text-xl mt-10 mb-3">
       {children}
     </h3>
   ),
   p: ({ children }) => (
-    <p className="text-ink-2 leading-[1.65] mb-(--space-lg)">
+    <p className="text-ink-2 text-[1.0625rem] leading-[1.75] mb-6">
       {children}
     </p>
   ),
   blockquote: ({ children }) => (
-    <blockquote className="my-(--space-xl) mx-0 pl-(--space-lg) border-l-(length:--rule-heavy) border-ink text-ink italic">
+    <blockquote className="my-8 mx-0 pl-5 border-l-2 border-neon text-ink-2">
       {children}
     </blockquote>
   ),
   ul: ({ children }) => (
-    <ul className="my-(--space-md) pl-6 list-disc marker:text-muted space-y-2 text-ink-2">
+    <ul className="my-4 pl-6 list-disc marker:text-neon-ink space-y-2 text-ink-2">
       {children}
     </ul>
   ),
   ol: ({ children }) => (
-    <ol className="my-(--space-md) pl-6 list-decimal marker:text-muted space-y-2 text-ink-2">
+    <ol className="my-4 pl-6 list-decimal marker:text-neon-ink font-normal space-y-2 text-ink-2">
       {children}
     </ol>
   ),
   li: ({ children }) => (
-    <li className="leading-[1.65] pl-1">{children}</li>
+    <li className="leading-[1.75] pl-1">{children}</li>
   ),
-  hr: () => <hr className="my-(--space-2xl) border-0 border-t border-rule" />,
+  hr: () => <hr className="my-12 border-0 border-t border-rule" />,
   a: ({ href, children }) => (
     <a
       href={href}
@@ -134,22 +135,22 @@ export const markdownComponents: Components = {
     <em className="italic">{children}</em>
   ),
   img: ({ src, alt }) => (
-    <span className="photo block my-(--space-xl)">
-      <img src={src} alt={alt ?? ''} className="w-full" />
+    <span className="block my-8">
+      <img src={src} alt={alt ?? ''} className="w-full rounded-xl border border-rule" />
     </span>
   ),
   table: ({ children }) => (
-    <div className="my-(--space-xl) overflow-x-auto border-t-(length:--rule-heavy) border-ink">
+    <div className="my-8 overflow-x-auto border border-rule rounded-xl bg-surface">
       <table className="w-full text-base border-collapse">{children}</table>
     </div>
   ),
   th: ({ children }) => (
-    <th className="label text-left text-ink px-3 py-2 border-b border-rule-2">
+    <th className="font-mono text-xs font-medium text-left text-muted px-4 py-2.5 border-b border-rule">
       {children}
     </th>
   ),
   td: ({ children }) => (
-    <td className="px-3 py-2 text-ink-2 border-b border-rule">
+    <td className="px-4 py-2.5 text-ink-2 border-b border-rule">
       {children}
     </td>
   ),

@@ -34,28 +34,25 @@ export function StatusBar() {
   const online = health?.status === 'ONLINE';
 
   return (
-    <div
-      role="status"
-      className="label fixed bottom-0 inset-x-0 z-(--z-sticky) h-8 bg-ink text-paper-3 text-xs"
-    >
+    <div role="status" className="fixed bottom-0 inset-x-0 z-50 h-8 bg-night text-night-muted font-mono text-xs">
       <div className="frame h-full flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <span>
-            API{' '}
-            <span className={online ? 'text-paper' : 'text-error'}>
-              {health ? health.status.toLowerCase() : 'checking'}
+          <span className="flex items-center gap-2">
+            <span aria-hidden="true" className={`size-1.5 rounded-full ${online ? 'bg-neon' : 'bg-danger'}`} />
+            <span>
+              system <span className={online ? 'text-neon' : 'text-danger'}>{health ? health.status.toLowerCase() : 'checking'}</span>
             </span>
           </span>
-          {health?.version && <span className="text-rule-2">{health.version}</span>}
+          {health?.version && <span className="hidden sm:inline">{health.version}</span>}
         </div>
 
         <div className="flex items-center gap-4">
           {latencyMs !== null && (
             <span>
-              Latency <span className="text-paper">{latencyMs} ms</span>
+              latency <span className="text-paper">{latencyMs}ms</span>
             </span>
           )}
-          <span className="hidden sm:inline text-rule-2">
+          <span className="hidden sm:inline">
             {new Date().toLocaleTimeString('en-GB', { hour12: false, timeZone: 'UTC' })} UTC
           </span>
         </div>

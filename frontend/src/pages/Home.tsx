@@ -3,115 +3,23 @@ import { api } from '../lib/api';
 import type { BlogPost, GitHubRepo } from '../types';
 import { BlogPostRow } from '../components/BlogPostRow';
 import { GitHubRepoCard } from '../components/GitHubRepoCard';
-
-const SC = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%&';
-const SOURCE = 'mohammed';
-const MID    = 'maxamed.'; // same length, collapses to "mxmd" by dropping indices 1,3,5,7
-const rnd = () => SC[Math.floor(Math.random() * SC.length)];
-
-const SKILLS = [
-  'C#', '.NET', 'Azure', 'SQL',
-  'React', 'TypeScript', 'REST APIs', 'Entity Framework',
-  'PostgreSQL', 'Docker', 'Git',
-];
-
-const CURRENT_ROLE = { company: 'Edenred UAE', title: 'Software Engineer', since: 'May 2025' };
+import { EDUCATION, EXPERIENCE, HIGHLIGHTS, PROFILE, PROJECTS, SKILLS } from '../content';
 
 const POSTS_PAGE_SIZE = 4;
+const MORE_REPOS = 6;
 
-function ScrambleName() {
-  const [chars, setChars] = useState<(string | null)[]>([...SOURCE]);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const clearT = () => {
-    if (timer.current) { clearInterval(timer.current); timer.current = null; }
-  };
-
-  const onEnter = () => {
-    clearT();
-    // Phase 1: scramble SOURCE → MID, locking left to right
-    let locked = 0;
-    setChars([...SOURCE].map(() => rnd()));
-    timer.current = setInterval(() => {
-      locked++;
-      const next: (string | null)[] = [...MID].map((ch, i) => i < locked ? ch : rnd());
-      setChars(next);
-      if (locked >= 8) {
-        clearT();
-        // Phase 2: collapse indices 7,5,3,1 (right→left) to shrink to "mxmd"
-        const dropping = [7, 5, 3, 1];
-        let step = 0;
-        const state: (string | null)[] = [...MID] as (string | null)[];
-        timer.current = setInterval(() => {
-          state[dropping[step]] = null;
-          step++;
-          setChars([...state]);
-          if (step >= dropping.length) clearT();
-        }, 80);
-      }
-    }, 50);
-  };
-
-  const onLeave = () => {
-    clearT();
-    // Jump to collapsed state: keep only m,x,m,d (indices 0,2,4,6)
-    const state: (string | null)[] = [MID[0], null, MID[2], null, MID[4], null, MID[6], null];
-    setChars([...state]);
-    // Phase 1: expand indices 1,3,5,7 back (left→right) to restore "maxamed."
-    const adding = [1, 3, 5, 7];
-    let step = 0;
-    timer.current = setInterval(() => {
-      state[adding[step]] = MID[adding[step]];
-      step++;
-      setChars([...state]);
-      if (step >= adding.length) {
-        clearT();
-        // Phase 2: scramble MID → SOURCE, locking right to left
-        let locked = 0;
-        const srcArr = [...SOURCE];
-        timer.current = setInterval(() => {
-          locked++;
-          setChars(srcArr.map((ch, i) => i >= 8 - locked ? ch : rnd()));
-          if (locked >= 8) {
-            clearT();
-            setChars([...SOURCE]);
-          }
-        }, 50);
-      }
-    }, 80);
-  };
-
-  useEffect(() => () => clearT(), []);
-
-  // The scramble swaps glyphs; it never moves anything, so it plays under reduced motion too.
-  return (
-    <h1
-      aria-label="mohammed omar"
-      className="max-w-none text-[clamp(4rem,9vw+1rem,10rem)] leading-[0.88] cursor-default select-none"
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
-    >
-      <span aria-hidden="true">{chars.filter(c => c !== null).join('')}</span>
-      <br aria-hidden="true" />
-      <span aria-hidden="true">omar</span>
-    </h1>
-  );
-}
-
-function Portrait() {
+function Avatar() {
   const [failed, setFailed] = useState(false);
 
   return (
-    <div className="photo aspect-[4/5] w-full bg-paper-2 overflow-hidden">
+    <div className="size-20 sm:size-24 shrink-0 rounded-xl overflow-hidden bg-ink ring-1 ring-rule">
       {failed ? (
-        <div className="w-full h-full flex items-center justify-center">
-          <span className="font-display font-extrabold text-ink text-display">MO</span>
-        </div>
+        <span className="size-full flex items-center justify-center font-mono text-xl font-medium text-neon">MO</span>
       ) : (
         <img
           src="/avatar.jpg"
-          alt="Mohammed Omar"
-          className="w-full h-full object-cover [filter:saturate(0.9)_contrast(1.04)]"
+          alt={PROFILE.name}
+          className="size-full object-cover"
           onError={() => setFailed(true)}
         />
       )}
@@ -119,11 +27,12 @@ function Portrait() {
   );
 }
 
-function SectionHead({ id, title }: { id: string; title: string }) {
+function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <h2 id={`${id}-title`} className="mb-(--space-xl)">
-      {title}
-    </h2>
+    <section id={id} aria-labelledby={`${id}-title`} className="pt-20 sm:pt-28">
+      <h2 id={`${id}-title`} className="section-title mb-8">{title}</h2>
+      {children}
+    </section>
   );
 }
 
@@ -173,128 +82,206 @@ export function Home() {
     }
   };
 
+  const repoFor = (name?: string) =>
+    name ? repos.find((r) => r.name.toLowerCase() === name.toLowerCase()) : undefined;
+  const featured = new Set(PROJECTS.map((p) => p.repo?.toLowerCase()));
+  const moreRepos = repos.filter((r) => !featured.has(r.name.toLowerCase())).slice(0, MORE_REPOS);
   const hasMorePosts = posts.length < postsTotal;
 
   return (
-    <main className="frame flex-1">
+    <main className="frame flex-1 pb-24">
       {/* Hero */}
-      <section
-        aria-label="Introduction"
-        className="flex flex-col md:flex-row md:items-end gap-(--gap-columns) md:gap-(--space-3xl) pt-(--space-2xl) pb-(--space-2xl)"
-      >
-        <div className="flex flex-col gap-(--space-lg) min-w-0">
-          <ScrambleName />
-          <p className="standfirst max-w-[30ch]">
-            Software Engineer with a deep passion for learning and building.
-          </p>
-          <div className="label flex flex-wrap gap-3">
-            <a
-              href="https://github.com/MohammedOmar3"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn--primary"
-            >
-              GitHub
-            </a>
-            <a
-              href="https://www.linkedin.com/in/mohammed-omar3/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn--secondary"
-            >
-              LinkedIn
-            </a>
+      <section aria-label="Introduction" className="pt-14 sm:pt-20">
+        <div className="flex items-center gap-5">
+          <Avatar />
+          <div className="min-w-0">
+            <h1 className="text-4xl sm:text-6xl">{PROFILE.name}</h1>
+            <p className="font-mono text-sm text-muted mt-2">
+              {PROFILE.role} <span className="text-rule-2">/</span> {EXPERIENCE[0].company}
+            </p>
           </div>
         </div>
 
-        <div className="w-full max-w-[26rem] md:max-w-none md:w-[min(42%,30rem)] md:shrink-0">
-          <Portrait />
+        <p className="mt-8 text-xl sm:text-2xl leading-snug text-ink-2 max-w-[36ch] tracking-tight">
+          {PROFILE.intro}
+        </p>
+
+        <p className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-xs text-muted">
+          <span>{PROFILE.location}</span>
+          <span className="flex items-center gap-2 text-ink">
+            <span aria-hidden="true" className="size-1.5 rounded-full bg-neon ring-2 ring-neon/30" />
+            {PROFILE.availability}
+          </span>
+        </p>
+
+        <div className="mt-8 flex flex-wrap gap-3">
+          <a href={`mailto:${PROFILE.email}`} className="btn btn-primary">Email me</a>
+          <a href={PROFILE.github} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">GitHub</a>
+          <a href={PROFILE.linkedin} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">LinkedIn</a>
         </div>
       </section>
 
-      {/* About */}
-      <section id="about" aria-labelledby="about-title" className="opens mt-(--space-xl)">
-        <SectionHead id="about" title="About" />
-        <div className="grid gap-(--gap-columns) md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-          <p className="statement">
-            I care about clean code, well-designed systems, and shipping things that work.
-            Currently focused on backend development with .NET and cloud infrastructure on Azure.
-          </p>
-
-          <dl className="m-0 grid gap-(--space-lg) content-start">
-            <div className="border-t border-rule pt-3">
-              <dt className="label text-muted">Now</dt>
-              <dd className="m-0 mt-1 text-ink">
-                {CURRENT_ROLE.title} at {CURRENT_ROLE.company}, since {CURRENT_ROLE.since}
+      {/* Highlights */}
+      <section aria-label="Highlights" className="mt-16 sm:mt-20 rounded-2xl bg-night text-paper overflow-hidden">
+        <dl className="grid grid-cols-2 lg:grid-cols-4 m-0">
+          {HIGHLIGHTS.map((h, i) => (
+            <div
+              key={h.label}
+              className={`p-6 sm:p-8 border-night-rule ${i % 2 ? 'border-l' : ''} ${i >= 2 ? 'border-t lg:border-t-0' : ''} ${i === 2 ? 'lg:border-l' : ''}`}
+            >
+              <dt className="sr-only">{h.label}</dt>
+              <dd className="m-0">
+                <span className="block text-3xl sm:text-4xl font-semibold tracking-tight text-neon">{h.value}</span>
+                <span className="block mt-2 text-sm text-night-muted leading-snug">{h.label}</span>
               </dd>
             </div>
-            <div className="border-t border-rule pt-3">
-              <dt className="label text-muted">Works with</dt>
-              <dd className="m-0 mt-1 text-ink">{SKILLS.join(', ')}</dd>
-            </div>
-          </dl>
-        </div>
+          ))}
+        </dl>
       </section>
 
-      {/* Work */}
-      <section id="work" aria-labelledby="work-title" className="opens mt-(--section-gap-s)">
-        <SectionHead id="work" title="Work" />
+      {/* Experience */}
+      <Section id="experience" title="Experience">
+        <ol className="list-none m-0 p-0 border-t border-rule">
+          {EXPERIENCE.map((role) => (
+            <li key={role.company} className="grid gap-x-8 gap-y-3 py-8 border-b border-rule md:grid-cols-[11rem_minmax(0,1fr)]">
+              <p className="font-mono text-xs text-muted pt-1.5">
+                {role.start} – {role.end}
+              </p>
+              <div className="min-w-0">
+                <h3 className="text-xl">
+                  {role.title} <span className="text-muted font-normal">at</span> {role.company}
+                </h3>
+                <p className="text-sm text-muted mt-1">
+                  {role.team ? `${role.team}, ` : ''}{role.location}
+                </p>
+                <ul className="mt-4 space-y-2.5 list-none p-0 max-w-[70ch]">
+                  {role.points.map((point) => (
+                    <li key={point} className="relative pl-5 text-ink-2">
+                      <span aria-hidden="true" className="absolute left-0 top-[0.7em] size-1.5 bg-neon-ink" />
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          ))}
+          <li className="grid gap-x-8 gap-y-3 py-8 border-b border-rule md:grid-cols-[11rem_minmax(0,1fr)]">
+            <p className="font-mono text-xs text-muted pt-1.5">{EDUCATION.year}</p>
+            <div className="min-w-0">
+              <h3 className="text-xl">
+                {EDUCATION.degree} <span className="text-muted font-normal">at</span> {EDUCATION.school}
+              </h3>
+              <p className="text-ink-2 mt-3 max-w-[70ch]">{EDUCATION.award}</p>
+            </div>
+          </li>
+        </ol>
+      </Section>
+
+      {/* Projects */}
+      <Section id="projects" title="Projects">
+        <div className="grid gap-5 md:grid-cols-2">
+          {PROJECTS.map((project) => {
+            const repo = repoFor(project.repo);
+            return (
+              <article key={project.name} className="flex flex-col rounded-2xl border border-rule bg-surface p-6 sm:p-7">
+                <div className="flex items-baseline justify-between gap-4">
+                  <h3 className="text-xl">{project.name}</h3>
+                  {repo && (
+                    <a href={repo.htmlUrl} target="_blank" rel="noopener noreferrer" className="link font-mono text-xs text-ink-2">
+                      Source
+                    </a>
+                  )}
+                </div>
+                <p className="mt-3 text-ink-2 flex-1">{project.summary}</p>
+                <ul className="mt-5 flex flex-wrap gap-1.5 list-none p-0 m-0">
+                  {project.stack.map((s) => <li key={s} className="chip">{s}</li>)}
+                </ul>
+              </article>
+            );
+          })}
+        </div>
+
+        <h3 className="mt-14 mb-2 text-base font-medium text-ink-2 tracking-normal">More on GitHub</h3>
         {reposLoading ? (
-          <ul aria-busy="true" className="list-none m-0 p-0 border-t border-rule">
-            {[1, 2, 3].map((i) => (
-              <li key={i} className="skeleton h-20 border-b border-rule" />
-            ))}
+          <ul aria-busy="true" className="list-none m-0 p-0 space-y-2">
+            {[1, 2, 3].map((i) => <li key={i} className="skeleton h-12" />)}
           </ul>
         ) : reposError ? (
-          <p className="label text-muted border-t border-rule pt-6">
-            The repositories didn’t load. GitHub has them all at{' '}
-            <a href="https://github.com/MohammedOmar3" className="link text-ink" target="_blank" rel="noopener noreferrer">
-              MohammedOmar3
-            </a>.
+          <p className="text-sm text-muted">
+            The repositories didn’t load. They’re all on{' '}
+            <a href={PROFILE.github} target="_blank" rel="noopener noreferrer" className="link text-ink">GitHub</a>.
           </p>
         ) : (
-          <ul className="list-none m-0 p-0 border-t border-rule">
-            {repos.map((repo) => (
-              <GitHubRepoCard key={repo.name} repo={repo} />
-            ))}
-          </ul>
+          <>
+            <ul className="list-none m-0 p-0 border-t border-rule">
+              {moreRepos.map((repo) => <GitHubRepoCard key={repo.name} repo={repo} />)}
+            </ul>
+            <p className="mt-5 text-sm">
+              <a href={PROFILE.github} target="_blank" rel="noopener noreferrer" className="link text-ink-2">
+                All repositories on GitHub
+              </a>
+            </p>
+          </>
         )}
-      </section>
+      </Section>
+
+      {/* Skills */}
+      <Section id="skills" title="Skills">
+        <dl className="m-0 border-t border-rule">
+          {SKILLS.map(({ group, items }) => (
+            <div key={group} className="grid gap-x-8 gap-y-2 py-5 border-b border-rule md:grid-cols-[11rem_minmax(0,1fr)]">
+              <dt className="font-mono text-xs text-muted pt-1">{group}</dt>
+              <dd className="m-0 flex flex-wrap gap-1.5">
+                {items.map((item) => <span key={item} className="chip">{item}</span>)}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
 
       {/* Journal */}
-      <section id="journal" aria-labelledby="journal-title" className="opens mt-(--section-gap-s)">
-        <SectionHead id="journal" title="Journal" />
+      <Section id="journal" title="Journal">
         {postsLoading ? (
-          <ul aria-busy="true" className="list-none m-0 p-0 border-t border-rule">
-            {[1, 2, 3].map((i) => (
-              <li key={i} className="skeleton h-24 border-b border-rule" />
-            ))}
+          <ul aria-busy="true" className="list-none m-0 p-0 space-y-2">
+            {[1, 2, 3].map((i) => <li key={i} className="skeleton h-20" />)}
           </ul>
         ) : postsError ? (
-          <p className="label text-muted border-t border-rule pt-6">The journal didn’t load. Try again in a moment.</p>
+          <p className="text-sm text-muted">The journal didn’t load. Try again in a moment.</p>
         ) : posts.length === 0 ? (
-          <p className="label text-muted border-t border-rule pt-6">No posts yet.</p>
+          <p className="text-sm text-muted">No posts yet.</p>
         ) : (
           <ul className="list-none m-0 p-0 border-t border-rule">
-            {posts.map((post) => (
-              <BlogPostRow key={post.id} post={post} />
-            ))}
+            {posts.map((post) => <BlogPostRow key={post.id} post={post} />)}
           </ul>
         )}
 
         {!postsLoading && hasMorePosts && (
-          <div className="label mt-(--space-xl)">
-            <button
-              type="button"
-              onClick={loadMore}
-              disabled={loadingMore}
-              aria-busy={loadingMore}
-              className="btn btn--secondary"
-            >
-              {loadingMore ? 'Loading posts' : 'Load more posts'}
+          <div className="mt-8">
+            <button type="button" onClick={loadMore} disabled={loadingMore} aria-busy={loadingMore} className="btn btn-ghost">
+              {loadingMore ? 'Loading…' : 'Load more posts'}
             </button>
           </div>
         )}
+      </Section>
+
+      {/* Contact */}
+      <section id="contact" aria-labelledby="contact-title" className="mt-20 sm:mt-28 rounded-2xl bg-night p-8 sm:p-12">
+        <h2 id="contact-title" className="text-3xl sm:text-4xl text-paper">Let’s talk.</h2>
+        <p className="mt-3 text-night-muted max-w-[48ch]">
+          Based in {PROFILE.location} and {PROFILE.availability.toLowerCase()}. The quickest way to reach me is email.
+        </p>
+        <p className="mt-8">
+          <a
+            href={`mailto:${PROFILE.email}`}
+            className="font-mono text-lg sm:text-2xl text-neon underline decoration-neon/40 decoration-2 underline-offset-[6px] hover:decoration-neon break-all"
+          >
+            {PROFILE.email}
+          </a>
+        </p>
+        <p className="mt-6 flex gap-6 text-sm">
+          <a href={PROFILE.github} target="_blank" rel="noopener noreferrer" className="text-paper underline decoration-night-rule underline-offset-4 hover:decoration-neon">GitHub</a>
+          <a href={PROFILE.linkedin} target="_blank" rel="noopener noreferrer" className="text-paper underline decoration-night-rule underline-offset-4 hover:decoration-neon">LinkedIn</a>
+        </p>
       </section>
     </main>
   );

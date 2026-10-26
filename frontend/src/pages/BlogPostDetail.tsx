@@ -41,8 +41,8 @@ export function BlogPostDetail() {
 
   if (loading) {
     return (
-      <main className="frame flex-1 pt-(--space-2xl)">
-        <div aria-busy="true" className="max-w-[44rem] mx-auto space-y-4">
+      <main className="frame flex-1 pt-14 sm:pt-20 pb-24">
+        <div aria-busy="true" className="max-w-[46rem] space-y-4">
           <div className="skeleton h-4 w-32" />
           <div className="skeleton h-16 w-3/4" />
           <div className="skeleton h-4 w-48" />
@@ -56,10 +56,10 @@ export function BlogPostDetail() {
 
   if (notFound || !post) {
     return (
-      <main className="frame flex-1 pt-(--space-2xl)">
-        <div className="max-w-[44rem] mx-auto">
-          <h1 className="text-display-s mb-(--space-lg)">Post not found</h1>
-          <button type="button" onClick={() => navigate(JOURNAL)} className="label btn btn--secondary">
+      <main className="frame flex-1 pt-14 sm:pt-20 pb-24">
+        <div className="max-w-[46rem]">
+          <h1 className="text-3xl sm:text-4xl mb-6">Post not found</h1>
+          <button type="button" onClick={() => navigate(JOURNAL)} className="btn btn-ghost">
             Back to the journal
           </button>
         </div>
@@ -70,28 +70,32 @@ export function BlogPostDetail() {
   const minutes = readingTime(post.content);
 
   return (
-    <main className="frame flex-1 pt-(--space-2xl)">
-      <article className="max-w-[44rem] mx-auto">
+    <main className="frame flex-1 pt-14 sm:pt-20 pb-24">
+      <article className="max-w-[46rem]">
+        <p className="text-sm mb-10">
+          <Link to={JOURNAL} className="link text-ink-2">Journal</Link>
+        </p>
 
-        <header className="opens mb-(--space-xl)">
-          <h1 className="text-display-s sm:text-display max-w-none mb-(--space-lg)">
+
+        <header className="mb-10">
+          <h1 className="text-3xl sm:text-5xl mb-5">
             {post.title}
           </h1>
 
-          <p className="label text-muted flex flex-wrap gap-x-6 gap-y-1">
+          <p className="font-mono text-xs text-muted flex flex-wrap gap-x-5 gap-y-1">
             <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
             <span>{minutes} min read</span>
-            {post.tags.length > 0 && <span>{post.tags.join(', ')}</span>}
+            {post.tags.map((tag) => <span key={tag} className="text-neon-ink">#{tag}</span>)}
           </p>
         </header>
 
-        <div className="border-t border-rule pt-(--space-xl)">
+        <div className="border-t border-rule pt-10">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
             {post.content}
           </ReactMarkdown>
         </div>
 
-        <p className="label mt-(--space-2xl) pt-(--space-lg) border-t border-rule">
+        <p className="text-sm mt-16 pt-6 border-t border-rule">
           <Link to={JOURNAL} className="link text-ink">All posts</Link>
         </p>
       </article>

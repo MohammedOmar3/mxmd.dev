@@ -30,8 +30,8 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/about" element={<Navigate to={{ pathname: '/', hash: '#about' }} replace />} />
-        <Route path="/projects" element={<Navigate to={{ pathname: '/', hash: '#work' }} replace />} />
+        <Route path="/about" element={<Navigate to="/" replace />} />
+        <Route path="/projects" element={<Navigate to={{ pathname: '/', hash: '#projects' }} replace />} />
         <Route path="/blog" element={<Navigate to={{ pathname: '/', hash: '#journal' }} replace />} />
         <Route path="/blog/:slug" element={<BlogPostDetail />} />
         <Route path="/admin" element={<Admin />} />
