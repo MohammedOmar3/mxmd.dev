@@ -168,7 +168,6 @@ export function Home() {
               <h3 className="text-xl">
                 {EDUCATION.degree} <span className="text-muted font-normal">at</span> {EDUCATION.school}
               </h3>
-              <p className="text-ink-2 mt-3 max-w-[70ch]">{EDUCATION.award}</p>
             </div>
           </li>
         </ol>

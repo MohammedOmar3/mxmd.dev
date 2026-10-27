@@ -39,7 +39,6 @@ export const EDUCATION = {
   school: 'Aston University',
   degree: 'BSc Computer Science',
   year: '2023',
-  award: '2nd place, company data hackathon (2025): built the backend APIs for a wallet app in two days.',
 };
 
 export interface Project {
