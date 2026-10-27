@@ -6,48 +6,38 @@ interface BlogPostRowProps {
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
+  return new Date(iso).toLocaleDateString('en-GB', {
     year: 'numeric',
     month: 'short',
     day: '2-digit',
   });
 }
 
+/** One post as a row in the Journal list. */
 export function BlogPostRow({ post }: BlogPostRowProps) {
   return (
-    <Link
-      to={`/blog/${post.slug}`}
-      className="block py-6 border-b border-gray-200 group flex items-start justify-between gap-4 hover:bg-gray-50 transition-colors px-1 no-underline"
-    >
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-3 mb-2">
-          <span className="font-mono text-[10px] text-gray-400 tracking-widest">
-            {formatDate(post.publishedAt)}
+    <li className="group">
+      <Link
+        to={`/blog/${post.slug}`}
+        className="grid gap-x-8 gap-y-2 py-6 border-b border-rule no-underline sm:grid-cols-[8rem_minmax(0,1fr)] hover:bg-surface transition-colors px-2 -mx-2 rounded-md"
+      >
+        <time dateTime={post.publishedAt} className="font-mono text-xs text-muted pt-1">
+          {formatDate(post.publishedAt)}
+        </time>
+        <span className="min-w-0">
+          <span className="block text-lg font-semibold tracking-tight text-ink group-hover:underline decoration-neon decoration-2 underline-offset-4">
+            {post.title}
           </span>
-          <div className="flex gap-1.5">
-            {post.tags.map((tag) => (
-              <span
-                key={tag}
-                className="font-mono text-[10px] border border-[#39FF14] text-[#2acc0f] px-1.5 py-0.5 uppercase tracking-wider"
-              >
-                [{tag}]
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <h3 className="font-sans text-lg font-bold text-black group-hover:text-gray-700 transition-colors leading-snug mb-1">
-          {post.title}
-        </h3>
-
-        <p className="text-xs text-gray-500 font-sans leading-relaxed max-w-xl">
-          {post.excerpt}
-        </p>
-      </div>
-
-      <span className="shrink-0 text-gray-300 group-hover:text-gray-600 text-xl font-light transition-colors">
-        +
-      </span>
-    </Link>
+          <span className="block text-sm text-ink-2 mt-1 max-w-[65ch]">{post.excerpt}</span>
+          {post.tags.length > 0 && (
+            <span className="flex flex-wrap gap-1.5 mt-3">
+              {post.tags.map((tag) => (
+                <span key={tag} className="chip">{tag}</span>
+              ))}
+            </span>
+          )}
+        </span>
+      </Link>
+    </li>
   );
 }

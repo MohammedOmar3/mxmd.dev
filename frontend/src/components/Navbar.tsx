@@ -1,53 +1,32 @@
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
+const SECTIONS = [
+  { hash: '#journal', label: 'Journal' },
+  { hash: '#experience', label: 'Experience' },
+  { hash: '#projects', label: 'Projects' },
+  { hash: '#contact', label: 'Contact' },
+];
 
 export function Navbar() {
   return (
-    <header className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white sticky top-0 z-50">
-      <NavLink
-        to="/"
-        className="font-mono text-sm font-semibold tracking-tight text-black hover:text-gray-600 transition-colors"
-      >
-        mxmd.dev
-      </NavLink>
+    <header className="sticky top-0 z-50 bg-paper/85 backdrop-blur-md border-b border-rule">
+      <div className="frame flex items-center justify-between h-16">
+        <Link to="/" className="font-mono text-sm font-medium text-ink no-underline hover:text-neon-ink">
+          mxmd<span className="text-neon-ink">.</span>dev
+        </Link>
 
-      <nav className="flex items-center gap-8">
-        <NavLink
-          to="/about"
-          className={({ isActive }) =>
-            `font-mono text-xs font-medium tracking-widest uppercase transition-colors ${
-              isActive
-                ? 'text-black underline underline-offset-4 decoration-[#39FF14] decoration-2'
-                : 'text-gray-500 hover:text-black'
-            }`
-          }
-        >
-          About
-        </NavLink>
-        <NavLink
-          to="/projects"
-          className={({ isActive }) =>
-            `font-mono text-xs font-medium tracking-widest uppercase transition-colors ${
-              isActive
-                ? 'text-black underline underline-offset-4 decoration-[#39FF14] decoration-2'
-                : 'text-gray-500 hover:text-black'
-            }`
-          }
-        >
-          Projects
-        </NavLink>
-        <NavLink
-          to="/blog"
-          className={({ isActive }) =>
-            `font-mono text-xs font-medium tracking-widest uppercase transition-colors ${
-              isActive
-                ? 'text-black underline underline-offset-4 decoration-[#39FF14] decoration-2'
-                : 'text-gray-500 hover:text-black'
-            }`
-          }
-        >
-          Blog
-        </NavLink>
-      </nav>
+        <nav aria-label="Sections" className="flex items-center gap-5 sm:gap-7">
+          {SECTIONS.map(({ hash, label }, i) => (
+            <Link
+              key={hash}
+              to={{ pathname: '/', hash }}
+              className={`text-sm text-ink-2 no-underline hover:text-ink ${i >= 2 ? 'hidden sm:inline' : ''}`}
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
+      </div>
     </header>
   );
 }

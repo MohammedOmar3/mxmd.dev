@@ -1,42 +1,166 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
 @import "tailwindcss";
 
 @theme {
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", monospace;
 
-  --color-accent: #39FF14;
-  --color-accent-muted: #2acc0f;
-  --color-surface: #0a0a0a;
-  --color-surface-1: #111111;
-  --color-surface-2: #1a1a1a;
-  --color-border: #222222;
-  --color-border-subtle: #1a1a1a;
-  --color-fg: #e8e8e8;
-  --color-fg-muted: #888888;
-  --color-fg-dim: #555555;
+  /* Light base, black ink, one neon */
+  --color-paper: #f5f5f0;
+  --color-surface: #ffffff;
+  --color-ink: #0a0a0a;
+  --color-ink-2: #3d3d3a;
+  --color-muted: #6e6e68;
+  --color-rule: #e3e3dc;
+  --color-rule-2: #c8c8c0;
+  --color-night: #0a0a0a;
+  --color-night-2: #161616;
+  --color-night-rule: #262626;
+  --color-night-muted: #8a8a8a;
+  --color-neon: #39ff14;
+  /* The neon is too light for text on paper; this is its readable sibling */
+  --color-neon-ink: #1c7a0a;
+  --color-danger: #ff4d4d;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
+:root {
+  color-scheme: light;
+  --frame: 72rem;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
 }
+
+@layer base {
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { overflow-x: clip; }
 
 html {
-  background-color: #f5f5f0;
-  color: #111111;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-padding-top: 5rem;
+  scrollbar-color: var(--color-rule-2) var(--color-paper);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  font-size: 1rem;
+  line-height: 1.6;
+  /* room for the fixed status bar */
+  padding-bottom: 2rem;
 }
 
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  color: var(--color-ink);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+p { margin: 0; text-wrap: pretty; }
+
+img { display: block; max-width: 100%; }
+
+::selection { background: var(--color-neon); color: var(--color-ink); }
+
+:focus-visible {
+  outline: 2px solid var(--color-neon-ink);
+  outline-offset: 3px;
+}
+}
+
+@layer components {
+.frame {
+  width: 100%;
+  max-width: var(--frame);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Section heading: a small neon square, then the title */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: clamp(1.5rem, 1.2vw + 1.1rem, 2rem);
+}
+.section-title::before {
+  content: "";
+  width: 0.625rem;
+  height: 0.625rem;
+  background: var(--color-neon);
+  flex-shrink: 0;
+}
+
+.link {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-color: var(--color-rule-2);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+  transition: text-decoration-color 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+.link:hover { text-decoration-color: var(--color-neon); text-decoration-thickness: 2px; }
+.link:active { color: var(--color-neon-ink); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1.125rem;
+  border: 1px solid var(--color-ink);
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
+}
+.btn-primary { background: var(--color-ink); color: var(--color-paper); }
+.btn-primary:hover { box-shadow: 0 0 0 3px var(--color-neon); }
+.btn-primary:active { background: var(--color-night-2); }
+.btn-ghost { background: transparent; color: var(--color-ink); border-color: var(--color-rule-2); }
+.btn-ghost:hover { border-color: var(--color-ink); background: var(--color-surface); }
+.btn-ghost:active { background: var(--color-rule); }
+.btn:disabled { color: var(--color-muted); border-color: var(--color-rule); background: transparent; box-shadow: none; cursor: progress; }
+
+/* Small mono chip for a stack item or tag */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--color-rule-2);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-ink-2);
+  background: var(--color-surface);
+}
+
+.skeleton { background: var(--color-rule); border-radius: 6px; }
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton { animation: skeleton-fade 1.2s ease-in-out infinite alternate; }
+}
+@keyframes skeleton-fade { from { opacity: 1; } to { opacity: 0.5; } }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }

@@ -31,38 +31,31 @@ export function StatusBar() {
     };
   }, []);
 
-  const statusColor = health?.status === 'ONLINE' ? '#39FF14' : '#FF4444';
+  const online = health?.status === 'ONLINE';
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-8 bg-black text-xs font-mono flex items-center justify-between px-4 z-50">
-      <div className="flex items-center gap-4">
-        <span className="flex items-center gap-1.5">
-          <span
-            className="w-1.5 h-1.5 rounded-full inline-block"
-            style={{ backgroundColor: statusColor }}
-          />
-          <span className="text-gray-400">
-            SYSTEM:{' '}
-            <span style={{ color: statusColor }}>
-              {health?.status ?? '...'}
+    <div role="status" className="fixed bottom-0 inset-x-0 z-50 h-8 bg-night text-night-muted font-mono text-xs">
+      <div className="frame h-full flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-2">
+            <span aria-hidden="true" className={`size-1.5 rounded-full ${online ? 'bg-neon' : 'bg-danger'}`} />
+            <span>
+              system <span className={online ? 'text-neon' : 'text-danger'}>{health ? health.status.toLowerCase() : 'checking'}</span>
             </span>
           </span>
-        </span>
-        {health?.version && (
-          <span className="text-gray-600">{health.version}</span>
-        )}
-      </div>
+          {health?.version && <span className="hidden sm:inline">{health.version}</span>}
+        </div>
 
-      <div className="flex items-center gap-4">
-        {latencyMs !== null && (
-          <span className="text-gray-600">
-            LATENCY:{' '}
-            <span className="text-gray-400">{latencyMs}MS</span>
+        <div className="flex items-center gap-4">
+          {latencyMs !== null && (
+            <span>
+              latency <span className="text-paper">{latencyMs}ms</span>
+            </span>
+          )}
+          <span className="hidden sm:inline">
+            {new Date().toLocaleTimeString('en-GB', { hour12: false, timeZone: 'UTC' })} UTC
           </span>
-        )}
-        <span className="text-gray-600">
-          {new Date().toLocaleTimeString('en-GB', { hour12: false })} UTC
-        </span>
+        </div>
       </div>
     </div>
   );
